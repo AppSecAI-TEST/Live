@@ -6,7 +6,6 @@ import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -14,8 +13,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tencent.rtmp.ITXLivePlayListener;
@@ -30,7 +27,6 @@ import com.tonglu.live.utils.ToastUtils;
 import com.tonglu.live.xdanmu.DanmuContainerView;
 import com.tonglu.okhttp.utils.OkLogger;
 
-import java.text.SimpleDateFormat;
 import java.util.Random;
 
 public class LivePlayerActivity extends Activity implements ITXLivePlayListener, View.OnClickListener {
@@ -42,12 +38,12 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
     private boolean mHWDecode = false;
     private LinearLayout mRootView;
 
-    private ImageView mBtnLog;
+    //private ImageView mBtnLog;
     private ImageView mBtnPlay;
-    private ImageView mBtnRenderRotation;
-    private ImageView mBtnRenderMode;
-    private ImageView mBtnHWDecode;
-    private ScrollView mScrollView;
+    //private ImageView mBtnRenderRotation;
+    //private ImageView mBtnRenderMode;
+    //private ImageView mBtnHWDecode;
+    //private ScrollView mScrollView;
 
     private static final int CACHE_STRATEGY_FAST = 1;  //极速
     private static final int CACHE_STRATEGY_SMOOTH = 2;  //流畅
@@ -72,8 +68,8 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
     private ImageView mBtnStop;
     private LinearLayout mLayoutCacheStrategy;
 
-    public TextView mLogViewStatus;
-    public TextView mLogViewEvent;
+    //public TextView mLogViewStatus;
+    //public TextView mLogViewEvent;
     protected StringBuffer mLogMsg = new StringBuffer("");
     private final int mLogMsgLenLimit = 3000;
 
@@ -130,8 +126,8 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
 
 
     void initView() {
-        mLogViewEvent = (TextView) findViewById(R.id.logViewEvent);
-        mLogViewStatus = (TextView) findViewById(R.id.logViewStatus);
+        //mLogViewEvent = (TextView) findViewById(R.id.logViewEvent);
+        //mLogViewStatus = (TextView) findViewById(R.id.logViewStatus);
 
 //------------------------------------------------------------------------------
         random = new Random();
@@ -140,7 +136,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
         DanmuAdapter danmuAdapter = new DanmuAdapter(this);
         danmuContainerView.setAdapter(danmuAdapter);
 
-        danmuContainerView.setSpeed(DanmuContainerView.HIGH_SPEED);
+        danmuContainerView.setSpeed(DanmuContainerView.LOW_SPEED);
         danmuContainerView.setGravity(DanmuContainerView.GRAVITY_TOP);
 
         handler.postDelayed(runnable, TIME); //每隔1s执行一条弹屏信息
@@ -156,11 +152,12 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
         mLoadingView = (ImageView) findViewById(R.id.loadingImageView);
 
         mVideoPlay = false; //默认设置为False
-        mLogViewStatus.setVisibility(View.GONE);
-        mLogViewStatus.setMovementMethod(new ScrollingMovementMethod());
-        mLogViewEvent.setMovementMethod(new ScrollingMovementMethod());
-        mScrollView = (ScrollView) findViewById(R.id.scrollview);
-        mScrollView.setVisibility(View.GONE);
+        //mLogViewStatus.setVisibility(View.GONE);
+        //mLogViewStatus.setMovementMethod(new ScrollingMovementMethod());
+        //mLogViewEvent.setMovementMethod(new ScrollingMovementMethod());
+        //mScrollView = (ScrollView) findViewById(R.id.scrollview);
+        //mScrollView.setVisibility(View.GONE);
+
 
 
         //点击播放
@@ -168,56 +165,14 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
         mBtnPlay.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-               OkLogger.e("click playbtn isplay:" + mVideoPlay + " ispause:" + mVideoPause + " playtype:" + mPlayType);
-                if (mVideoPlay) {
-                    if (mPlayType == TXLivePlayer.PLAY_TYPE_VOD_FLV || mPlayType == TXLivePlayer.PLAY_TYPE_VOD_HLS || mPlayType == TXLivePlayer.PLAY_TYPE_VOD_MP4 || mPlayType == TXLivePlayer.PLAY_TYPE_LOCAL_VIDEO) {
-                        if (mVideoPause) {
-                            mLivePlayer.resume();
-                            mBtnPlay.setImageResource(R.mipmap.play_pause);
-                            mRootView.setBackgroundColor(0xff000000);
-                        } else {
-                            mLivePlayer.pause();
-                            mBtnPlay.setImageResource(R.mipmap.play_start);
-                        }
-                        mVideoPause = !mVideoPause;
-
-                    } else {
-                        stopPlayRtmp();
-                        mVideoPlay = !mVideoPlay;
-                    }
-
-                } else {
-                    if (startPlayRtmp()) {
-                        mVideoPlay = !mVideoPlay;
-                    }
-                }
+                OkLogger.e("click playbtn isplay:" + mVideoPlay + " ispause:" + mVideoPause + " playtype:" + mPlayType);
+                toPlay();
             }
         });
 
-        if (mVideoPlay) {
-            if (mPlayType == TXLivePlayer.PLAY_TYPE_VOD_FLV || mPlayType == TXLivePlayer.PLAY_TYPE_VOD_HLS || mPlayType == TXLivePlayer.PLAY_TYPE_VOD_MP4 || mPlayType == TXLivePlayer.PLAY_TYPE_LOCAL_VIDEO) {
-                if (mVideoPause) {
-                    mLivePlayer.resume();
-                    mBtnPlay.setImageResource(R.mipmap.play_pause);
-                    mRootView.setBackgroundColor(0xff000000);
-                } else {
-                    mLivePlayer.pause();
-                    mBtnPlay.setImageResource(R.mipmap.play_start);
-                }
-                mVideoPause = !mVideoPause;
+        toPlay();//播放
 
-            } else {
-                stopPlayRtmp();
-                mVideoPlay = !mVideoPlay;
-            }
-
-        } else {
-            if (startPlayRtmp()) {
-                mVideoPlay = !mVideoPlay;
-            }
-        }
-
-        //停止按钮
+        //停止按钮(不保留最后一帧，直接停止播放)
         mBtnStop = (ImageView) findViewById(R.id.btnStop);
         mBtnStop.setOnClickListener(new OnClickListener() {
             @Override
@@ -229,15 +184,15 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
         });
 
         //日志Log
-        mBtnLog = (ImageView) findViewById(R.id.btnLog);
+        /*mBtnLog = (ImageView) findViewById(R.id.btnLog);
         mBtnLog.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mLogViewStatus.getVisibility() == View.GONE) {
                     mLogViewStatus.setVisibility(View.VISIBLE);
-                    mScrollView.setVisibility(View.VISIBLE);
-                    mLogViewEvent.setText(mLogMsg);
-                    scroll2Bottom(mScrollView, mLogViewEvent);
+                    //mScrollView.setVisibility(View.VISIBLE);
+                    //mLogViewEvent.setText(mLogMsg);
+                    //scroll2Bottom(mScrollView, mLogViewEvent);
                     mBtnLog.setImageResource(R.mipmap.log_hidden);
                 } else {
                     mLogViewStatus.setVisibility(View.GONE);
@@ -245,76 +200,8 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
                     mBtnLog.setImageResource(R.mipmap.log_show);
                 }
             }
-        });
+        });*/
 
-        //横屏|竖屏
-        mBtnRenderRotation = (ImageView) findViewById(R.id.btnOrientation);
-        mBtnRenderRotation.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mLivePlayer == null) {
-                    return;
-                }
-                if (mCurrentRenderRotation == TXLiveConstants.RENDER_ROTATION_PORTRAIT) {
-                    mBtnRenderRotation.setBackgroundResource(R.mipmap.portrait);
-                    mCurrentRenderRotation = TXLiveConstants.RENDER_ROTATION_LANDSCAPE;
-                } else if (mCurrentRenderRotation == TXLiveConstants.RENDER_ROTATION_LANDSCAPE) {
-                    mBtnRenderRotation.setBackgroundResource(R.mipmap.landscape);
-                    mCurrentRenderRotation = TXLiveConstants.RENDER_ROTATION_PORTRAIT;
-                }
-
-                mLivePlayer.setRenderRotation(mCurrentRenderRotation);
-            }
-        });
-
-        //平铺模式
-        mBtnRenderMode = (ImageView) findViewById(R.id.btnRenderMode);
-        mBtnRenderMode.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mLivePlayer == null) {
-                    return;
-                }
-
-                if (mCurrentRenderMode == TXLiveConstants.RENDER_MODE_FULL_FILL_SCREEN) {
-                    mLivePlayer.setRenderMode(TXLiveConstants.RENDER_MODE_ADJUST_RESOLUTION);
-                    mBtnRenderMode.setBackgroundResource(R.mipmap.fill_mode);
-                    mCurrentRenderMode = TXLiveConstants.RENDER_MODE_ADJUST_RESOLUTION;
-                } else if (mCurrentRenderMode == TXLiveConstants.RENDER_MODE_ADJUST_RESOLUTION) {
-                    mLivePlayer.setRenderMode(TXLiveConstants.RENDER_MODE_FULL_FILL_SCREEN);
-                    mBtnRenderMode.setBackgroundResource(R.mipmap.adjust_mode);
-                    mCurrentRenderMode = TXLiveConstants.RENDER_MODE_FULL_FILL_SCREEN;
-                }
-            }
-        });
-
-        //硬件解码
-        mBtnHWDecode = (ImageView) findViewById(R.id.btnHWDecode);
-        //mBtnHWDecode.getBackground().setAlpha(mHWDecode ? 255 : 100);
-        mBtnHWDecode.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mHWDecode = !mHWDecode;
-                //mBtnHWDecode.getBackground().setAlpha(mHWDecode ? 255 : 100);
-
-                if (mHWDecode) {
-                    ToastUtils.showLongToastSafe("已开启硬件解码加速，切换会重启播放流程!");
-                } else {
-                    ToastUtils.showLongToastSafe("已关闭硬件解码加速，切换会重启播放流程!");
-                }
-
-                if (mVideoPlay) {
-                    stopPlayRtmp();
-                    startPlayRtmp();
-                    if (mVideoPause) {
-                        if (mPlayerView != null) {
-                            mPlayerView.onResume();
-                        }
-                        mVideoPause = false;
-                    }
-                }
-            }
-        });
 
         //缓存策略
         mBtnCacheStrategy = (ImageView) findViewById(R.id.btnCacheStrategy);
@@ -359,6 +246,25 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
         view.setOnClickListener(this);
     }
 
+    private void toPlay() {
+        if (mVideoPlay) {
+            if (mVideoPause) {
+                mLivePlayer.resume();
+                mBtnPlay.setImageResource(R.mipmap.play_pause);
+                mRootView.setBackgroundColor(0xff000000);
+            } else {
+                mLivePlayer.pause();
+                mBtnPlay.setImageResource(R.mipmap.play_start);
+            }
+            mVideoPause = !mVideoPause;
+
+        } else {
+            if (startPlayRtmp()) {
+                mVideoPlay = !mVideoPlay;
+            }
+        }
+    }
+
     private int TIME = 1000;
     Handler handler = new Handler();
     Runnable runnable = new Runnable() {
@@ -382,7 +288,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
 
 //------------------------------------------------------------------------------
 
-    public static void scroll2Bottom(final ScrollView scroll, final View inner) {
+    /*public static void scroll2Bottom(final ScrollView scroll, final View inner) {
         if (scroll == null || inner == null) {
             return;
         }
@@ -391,7 +297,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
             offset = 0;
         }
         scroll.scrollTo(0, offset);
-    }
+    }*/
 
     @Override
     public void onDestroy() {
@@ -436,12 +342,8 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
         super.onResume();
 
         if (mVideoPlay && !mVideoPause) {
-            if (mPlayType == TXLivePlayer.PLAY_TYPE_VOD_FLV || mPlayType == TXLivePlayer.PLAY_TYPE_VOD_HLS || mPlayType == TXLivePlayer.PLAY_TYPE_VOD_MP4 || mPlayType == TXLivePlayer.PLAY_TYPE_LOCAL_VIDEO) {
-                if (mLivePlayer != null) {
-                    mLivePlayer.resume();
-                }
-            } else {
-                //startPlayRtmp();
+            if (mLivePlayer != null) {
+                mLivePlayer.resume();
             }
         }
 
@@ -476,31 +378,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
                 }
             }
             break;
-            /*case ACTIVITY_TYPE_VOD_PLAY: {
-                if (playUrl.startsWith("http://") || playUrl.startsWith("https://")) {
-                    if (playUrl.contains(".flv")) {
-                        mPlayType = TXLivePlayer.PLAY_TYPE_VOD_FLV;
-                    } else if (playUrl.contains(".m3u8")) {
-                        mPlayType = TXLivePlayer.PLAY_TYPE_VOD_HLS;
-                    } else if (playUrl.toLowerCase().contains(".mp4")) {
-                        mPlayType = TXLivePlayer.PLAY_TYPE_VOD_MP4;
-                    } else {
-                        ToastUtils.showLongToastSafe("播放地址不合法，点播目前仅支持flv,hls,mp4播放方式!");
-                        return false;
-                    }
-                } else if (playUrl.startsWith("/")) {
-                    if (playUrl.contains(".mp4") || playUrl.contains(".flv")) {
-                        mPlayType = TXLivePlayer.PLAY_TYPE_LOCAL_VIDEO;
-                    } else {
-                        ToastUtils.showLongToastSafe("播放地址不合法，目前本地播放器仅支持播放mp4，flv格式文件");
-                        return false;
-                    }
-                } else {
-                    ToastUtils.showLongToastSafe("播放地址不合法，点播目前仅支持flv,hls,mp4播放方式!");
-                    return false;
-                }
-            }
-            break;*/
+
             default:
                 ToastUtils.showLongToastSafe("播放地址不合法，目前仅支持rtmp,flv,hls,mp4播放方式!");
                 return false;
@@ -508,13 +386,13 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
         return true;
     }
 
-    protected void clearLog() {
+    /*protected void clearLog() {
         mLogMsg.setLength(0);
-        mLogViewEvent.setText("");
-        mLogViewStatus.setText("");
-    }
+        //mLogViewEvent.setText("");
+        //mLogViewStatus.setText("");
+    }*/
 
-    protected void appendEventLog(int event, String message) {
+    /*protected void appendEventLog(int event, String message) {
         String str = "receive event: " + event + ", " + message;
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
         String date = sdf.format(System.currentTimeMillis());
@@ -525,7 +403,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
             mLogMsg = mLogMsg.delete(0, idx);
         }
         mLogMsg = mLogMsg.append("\n" + "[" + date + "]" + message);
-    }
+    }*/
 
     private boolean startPlayRtmp() {
 //          由于iOS AppStore要求新上架的app必须使用https,所以后续腾讯云的视频连接会支持https,
@@ -538,12 +416,12 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
             return false;
         }
 
-        clearLog();
+        //clearLog();
 
         int[] ver = TXLivePlayer.getSDKVersion();
         if (ver != null && ver.length >= 4) {
             mLogMsg.append(String.format("rtmp sdk version:%d.%d.%d.%d ", ver[0], ver[1], ver[2], ver[3]));
-            mLogViewEvent.setText(mLogMsg);
+            //mLogViewEvent.setText(mLogMsg);
         }
         mBtnPlay.setImageResource(R.mipmap.play_pause);
         mRootView.setBackgroundColor(0xff000000);
@@ -571,7 +449,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
             return false;
         }
 
-        appendEventLog(0, "点击播放按钮！播放类型：" + mPlayType);
+        //appendEventLog(0, "点击播放按钮！播放类型：" + mPlayType);
 
         startLoadingAnimation();
 
@@ -605,11 +483,11 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
         }
 
         String msg = param.getString(TXLiveConstants.EVT_DESCRIPTION);
-        appendEventLog(event, msg);
+       /* appendEventLog(event, msg);
         if (mScrollView.getVisibility() == View.VISIBLE) {
             mLogViewEvent.setText(mLogMsg);
             scroll2Bottom(mScrollView, mLogViewEvent);
-        }
+        }*/
 //        if(mLivePlayer != null){
 //            mLivePlayer.onLogRecord("[event:"+event+"]"+msg+"\n");
 //        }
@@ -640,7 +518,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
     @Override
     public void onNetStatus(Bundle status) {
         String str = getNetStatusString(status);
-        mLogViewStatus.setText(str);
+        //mLogViewStatus.setText(str);
         OkLogger.e("Current status, CPU:" + status.getString(TXLiveConstants.NET_STATUS_CPU_USAGE) +
                 ", RES:" + status.getInt(TXLiveConstants.NET_STATUS_VIDEO_WIDTH) + "*" + status.getInt(TXLiveConstants.NET_STATUS_VIDEO_HEIGHT) +
                 ", SPD:" + status.getInt(TXLiveConstants.NET_STATUS_NET_SPEED) + "Kbps" +
