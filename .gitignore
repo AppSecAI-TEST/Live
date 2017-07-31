@@ -27,3 +27,4 @@ proguard/
 *.iml
 credential.properties
 /captures
+/.idea
