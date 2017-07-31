@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_titlebar"
+    android:layout_width="match_parent"
+    android:layout_height="45dp"
+    android:background="@color/white">
+
+    <TextView
+        android:id="@+id/text_title"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:maxLength="9"
+        android:textColor="@color/black"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/button_backward"
+        android:layout_width="60dp"
+        android:layout_height="match_parent"
+        android:background="@null"
+        android:drawableLeft="@mipmap/ic_back"
+        android:drawablePadding="6dp"
+        android:ellipsize="marquee"
+        android:gravity="center"
+        android:onClick="onClick"
+        android:paddingLeft="20dp"
+        android:text="返回"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:visibility="invisible" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/button_forward"
+            android:layout_width="75dp"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:drawableRight="@mipmap/ic_back"
+            android:gravity="center"
+            android:onClick="onClick"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:visibility="invisible" />
+
+        <Button
+            android:id="@+id/button_forward2"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:drawableLeft="@mipmap/ic_back"
+            android:gravity="center"
+            android:onClick="onClick"
+            android:paddingLeft="25px"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:visibility="invisible" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_alignParentBottom="true"
+        android:background="@color/gray_CCCCCC" />
+
+</RelativeLayout>

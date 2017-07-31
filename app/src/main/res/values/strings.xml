@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Live</string>
+    <item type="id" name="tag_inner_entity"></item>
+</resources>
