@@ -32,6 +32,10 @@
             </intent-filter>
         </activity>
 
+        <meta-data
+            android:name="app.server"
+            android:value="http://10.38.50.9:8525"/>
+
         <activity
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
             android:name=".activity.LivePlayerActivity"

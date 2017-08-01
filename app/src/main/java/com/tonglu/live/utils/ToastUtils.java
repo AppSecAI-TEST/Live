@@ -316,7 +316,7 @@ public class ToastUtils {
      * @param context
      * @return
      */
-   /* public static Dialog createLoadingDialog(Context context) {
+    public static Dialog createLoadingDialog(Context context) {
 
         LayoutInflater inflater = LayoutInflater.from(context);
         View v = inflater.inflate(R.layout.layout_loading_dialog, null); // 得到加载view
@@ -326,6 +326,6 @@ public class ToastUtils {
         loadingDialog.setCancelable(false); // 不可以用"返回键"取消
         loadingDialog.setContentView(layout);
         return loadingDialog;
-    }*/
+    }
 
 }

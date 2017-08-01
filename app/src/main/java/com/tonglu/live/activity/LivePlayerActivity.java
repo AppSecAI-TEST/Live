@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+import android.widget.ViewFlipper;
 
 import com.tencent.rtmp.ITXLivePlayListener;
 import com.tencent.rtmp.TXLiveConstants;
@@ -40,9 +41,6 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
 
     //private ImageView mBtnLog;
     private ImageView mBtnPlay;
-    //private ImageView mBtnRenderRotation;
-    //private ImageView mBtnRenderMode;
-    //private ImageView mBtnHWDecode;
     //private ScrollView mScrollView;
 
     private static final int CACHE_STRATEGY_FAST = 1;  //极速
@@ -110,9 +108,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
         //播放类型
         mActivityType = getIntent().getIntExtra("PLAY_TYPE", ACTIVITY_TYPE_LIVE_PLAY);
         mPlayConfig = new TXLivePlayConfig();
-
         initView();
-
     }
 
     private void handleIntent() {
@@ -158,8 +154,6 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
         //mScrollView = (ScrollView) findViewById(R.id.scrollview);
         //mScrollView.setVisibility(View.GONE);
 
-
-
         //点击播放
         mBtnPlay = (ImageView) findViewById(R.id.btnPlay);
         mBtnPlay.setOnClickListener(new OnClickListener() {
@@ -171,6 +165,16 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
         });
 
         toPlay();//播放
+
+
+        // 为ViewFlipper添加广告条
+        ViewFlipper vf = (ViewFlipper) findViewById(R.id.marquee_view);
+        View v = View.inflate(this, R.layout.item_super_danmu, null);
+        vf.addView(v);
+            /*TextView tv1 = (TextView) v.findViewById(R.id.tv_auto_new1);
+            tv1.setText("asdfajk阿卡丽手机卡咖啡---"+i);*/
+
+
 
         //停止按钮(不保留最后一帧，直接停止播放)
         mBtnStop = (ImageView) findViewById(R.id.btnStop);

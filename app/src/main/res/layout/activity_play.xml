@@ -176,6 +176,26 @@
             </RadioGroup>
         </LinearLayout>
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15px"
+            android:background="@color/white"
+            android:padding="20px">
+
+            <ViewFlipper
+                android:id="@+id/marquee_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autoStart="true"
+                android:background="@color/white"
+                android:flipInterval="2500"
+                android:inAnimation="@anim/anim_marquee_in"
+                android:outAnimation="@anim/anim_marquee_out">
+
+            </ViewFlipper>
+        </RelativeLayout>
+
         <com.tonglu.live.xdanmu.DanmuContainerView
             android:id="@+id/danmuContainerView"
             android:layout_width="match_parent"
