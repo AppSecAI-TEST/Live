@@ -5,10 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/btn"
+    <!-- <Button
+         android:id="@+id/btn"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:text="点击开启直播" />-->
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="点击开启直播" />
+        android:layout_height="match_parent" />
 
 </LinearLayout>
