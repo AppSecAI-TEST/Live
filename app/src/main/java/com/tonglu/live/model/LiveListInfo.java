@@ -15,6 +15,8 @@ import java.util.List;
 
 public class LiveListInfo implements Serializable {
 
+    private static final long serialVersionUID = -785423284335780355L;
+
     public boolean IsSuccess;
     public String errormsg;
     public List<RecordsBean> records;

@@ -19,7 +19,6 @@ import com.tonglu.live.utils.GsonConvertUtil;
 import com.tonglu.live.utils.MD5Utils;
 import com.tonglu.live.utils.ToastUtils;
 import com.tonglu.okhttp.model.Response;
-import com.tonglu.okhttp.utils.OkLogger;
 
 import java.util.List;
 import java.util.Map;
@@ -59,18 +58,20 @@ public class MainActivity extends BaseTitleActivity {
         getLiveList();  //请求直播地址
 
         mRecyclerView.setAdapter(mLiveAdapter);
+
     }
 
 
+    //获取直播列表
     private void getLiveList() {
         String url = "v/VedioAddress";
 
         Map<String, String> params = new TreeMap<>();
-        params.put("appkey", Constants.APP_KEY);
+        params.put("appkey", Constants.APP_KEY_);
         params.put("appsecret", Constants.APP_SECRET);
 
         //MD5加密
-        String signTest = "abc" + Constants.APP_KEY + Constants.APP_SECRET + "cba";
+        String signTest = "abc" + Constants.APP_KEY_ + Constants.APP_SECRET + "cba";
         params.put("sign", MD5Utils.MD5(signTest));
 
         String jsonParams = GsonConvertUtil.toJson(params);
@@ -91,7 +92,6 @@ public class MainActivity extends BaseTitleActivity {
                     }
                     //OkLogger.e("------>" + listInfo);
                 }
-
             }
 
             @Override
@@ -100,6 +100,7 @@ public class MainActivity extends BaseTitleActivity {
                 ToastUtils.showLongToastSafe("请确认服务器是否开启！");
             }
         });
-
     }
+
+
 }

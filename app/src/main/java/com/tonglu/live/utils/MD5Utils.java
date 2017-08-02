@@ -1,6 +1,7 @@
 package com.tonglu.live.utils;
 
 import android.text.TextUtils;
+
 import com.tonglu.okhttp.utils.OkLogger;
 
 import java.security.MessageDigest;
@@ -8,6 +9,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
+
+import static com.tonglu.live.utils.Constants.APP_KEY;
 
 /**
  * ===========================================
@@ -20,6 +23,8 @@ import java.util.TreeMap;
 public class MD5Utils {
 
 
+
+
     private MD5Utils() {
         //防止初始化
     }
@@ -29,11 +34,13 @@ public class MD5Utils {
      *
      * @return
      */
-    public static String signRequest() {
+    public static String signRequest(String currentTime) {
 
-        StringBuilder query = new StringBuilder(Constants.APP_SECRET);
+        StringBuilder query = new StringBuilder(Constants.SECRET_REQUEST_BODY);
         Map<String, String> map = new TreeMap<>();
-        map.put("appkey", Constants.APP_KEY);
+        map.put("AppKey", Constants.APP_KEY);
+        map.put("Version", Constants.APP_VERSION);
+        map.put("TimeStamp", currentTime);
         // 第一步：把字典按Key的字母顺序排序
         Map<String, String> resultMap = sortMapByKey(map);
         for (Map.Entry<String, String> entry : resultMap.entrySet()) {

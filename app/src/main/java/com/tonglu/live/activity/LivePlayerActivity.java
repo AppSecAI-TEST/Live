@@ -14,7 +14,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-import android.widget.ViewFlipper;
 
 import com.tencent.rtmp.ITXLivePlayListener;
 import com.tencent.rtmp.TXLiveConstants;
@@ -22,13 +21,24 @@ import com.tencent.rtmp.TXLivePlayConfig;
 import com.tencent.rtmp.TXLivePlayer;
 import com.tencent.rtmp.ui.TXCloudVideoView;
 import com.tonglu.live.R;
-import com.tonglu.live.adapter.DanmuAdapter;
-import com.tonglu.live.adapter.DanmuEntity;
+import com.tonglu.live.callback.JsonCallback;
+import com.tonglu.live.danmu.Danmu;
+import com.tonglu.live.danmu.DanmuControl;
+import com.tonglu.live.manager.CommonBody;
+import com.tonglu.live.model.RollListInfo;
+import com.tonglu.live.utils.GsonConvertUtil;
 import com.tonglu.live.utils.ToastUtils;
-import com.tonglu.live.xdanmu.DanmuContainerView;
+import com.tonglu.okhttp.OkHttpUtil;
+import com.tonglu.okhttp.model.Response;
 import com.tonglu.okhttp.utils.OkLogger;
 
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import master.flame.danmaku.controller.IDanmakuView;
 
 public class LivePlayerActivity extends Activity implements ITXLivePlayListener, View.OnClickListener {
 
@@ -82,9 +92,19 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
 
     protected String mUrlAddress;//直播地址
 
-    DanmuContainerView danmuContainerView;
-    public String SEED[] = {"来自武汉的订单", "来自上海的订单", "，来自北京的订单 ~~ 。6不6，", "~~，来自杭州的订单", " 大家好才是真的好"};
-    Random random;
+    //弹幕相关
+    private DanmuControl mDanmuControl;
+    private IDanmakuView mDanmakuView;
+
+
+    private final int userId = 30224;
+
+    /*String[] avatars = {
+            "http://upload.cguoguo.com/upload/2016-02-29/56d45c8f21dac.jpg",
+            "http://upload.cguoguo.com/upload/2015-12-22/5678f5f3e64dd.jpg",
+            "http://upload.cguoguo.com/upload/def.jpg"
+    };*/
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -109,6 +129,8 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
         mActivityType = getIntent().getIntExtra("PLAY_TYPE", ACTIVITY_TYPE_LIVE_PLAY);
         mPlayConfig = new TXLivePlayConfig();
         initView();
+
+        getRollList();//请求弹幕信息
     }
 
     private void handleIntent() {
@@ -120,22 +142,54 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
         }
     }
 
+    List<Danmu> danmus = new ArrayList<>();
+    int i = 0;
+
+    private int TIME = 15000;//15秒显示一次弹幕信息
+    Handler handler = new Handler();
+    Runnable runnable = new Runnable() {
+
+        @Override
+        public void run() {
+            // handler自带方法实现定时器
+            try {
+                handler.postDelayed(this, TIME);
+
+                //Danmu danmu1 = new Danmu(0, userId, "Comment", avatars[0], " 我：这是一条弹幕");
+                //Danmu danmu2 = new Danmu(0, 1, "Comment", avatars[1], "楼主：这又是一又是一条弹幕");
+                //Danmu danmu3 = new Danmu(0, 3, "Comment", avatars[2], " 普通：这还是一条弹幕");
+                //danmus.add(danmu1);
+                //danmus.add(danmu2);
+                //danmus.add(danmu3);
+                //Collections.shuffle(danmus);
+                //danmus.remove(0);
+                //danmus.remove(0);
+                /*******TEST********/
+
+
+                // 添加弹幕
+                mDanmuControl.addDanmu(danmus.get(i++));
+                OkLogger.e("-------------i> " + i);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    };
 
     void initView() {
         //mLogViewEvent = (TextView) findViewById(R.id.logViewEvent);
         //mLogViewStatus = (TextView) findViewById(R.id.logViewStatus);
 
 //------------------------------------------------------------------------------
-        random = new Random();
-        danmuContainerView = (DanmuContainerView) findViewById(R.id.danmuContainerView);
+        mDanmakuView = (IDanmakuView) findViewById(R.id.danmakuView);
 
-        DanmuAdapter danmuAdapter = new DanmuAdapter(this);
-        danmuContainerView.setAdapter(danmuAdapter);
+        mDanmuControl = new DanmuControl(this); //设置弹幕视图
+        mDanmuControl.setDanmakuView(mDanmakuView);
+        mDanmuControl.setUserId(userId);    //设置用户id，区别背景色
 
-        danmuContainerView.setSpeed(DanmuContainerView.LOW_SPEED);
-        danmuContainerView.setGravity(DanmuContainerView.GRAVITY_TOP);
 
-        handler.postDelayed(runnable, TIME); //每隔1s执行一条弹屏信息
+        TIME = (int) Math.round(Math.random() * (10000 - 400) + 10000);
+        handler.postDelayed(runnable, TIME); //每隔s执行一条弹屏信息
 //------------------------------------------------------------------------------
 
         mRootView = (LinearLayout) findViewById(R.id.root);
@@ -166,17 +220,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
 
         toPlay();//播放
 
-
-        // 为ViewFlipper添加广告条
-        ViewFlipper vf = (ViewFlipper) findViewById(R.id.marquee_view);
-        View v = View.inflate(this, R.layout.item_super_danmu, null);
-        vf.addView(v);
-            /*TextView tv1 = (TextView) v.findViewById(R.id.tv_auto_new1);
-            tv1.setText("asdfajk阿卡丽手机卡咖啡---"+i);*/
-
-
-
-        //停止按钮(不保留最后一帧，直接停止播放)
+        //停止按钮(不保留最后一帧，直接停止)
         mBtnStop = (ImageView) findViewById(R.id.btnStop);
         mBtnStop.setOnClickListener(new OnClickListener() {
             @Override
@@ -269,26 +313,6 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
         }
     }
 
-    private int TIME = 1000;
-    Handler handler = new Handler();
-    Runnable runnable = new Runnable() {
-
-        @Override
-        public void run() {
-            // handler自带方法实现定时器
-            try {
-                handler.postDelayed(this, TIME);
-                DanmuEntity danmuEntity = new DanmuEntity();
-                danmuEntity.setContent(SEED[random.nextInt(5)]);
-                danmuEntity.setType(0);
-                danmuEntity.setTime("23:20:11");
-                danmuContainerView.addDanmu(danmuEntity);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    };
 
 //------------------------------------------------------------------------------
 
@@ -317,11 +341,13 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
         mPlayConfig = null;
 
         OkLogger.e("----------------->vrender onDestroy");
+        mDanmuControl.destroy();
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        mDanmuControl.pause();
     }
 
     @Override
@@ -354,6 +380,9 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
         if (mPlayerView != null) {
             mPlayerView.onResume();
         }
+
+        //danmu生命周期
+        mDanmuControl.resume();
     }
 
     @Override
@@ -589,4 +618,50 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
             mRtmpUrlView.setText(result);
         }
     }*/
+
+
+    //public List<RollListInfo.DataBean> data;
+
+    //获取直播列表(默认请求30条弹幕信息)
+    private void getRollList() {
+        String url = "http://yfb-dx.591malls.com:5318/api/Order/RollOrderList";
+
+        Map<String, String> params = new TreeMap<>();
+        params.put("count", "10");
+        params.putAll(CommonBody.getInstance().commonBody());
+        String jsonParams = GsonConvertUtil.toJson(params);
+
+        OkHttpUtil.<String>post(url).upJson(jsonParams).tag(this).execute(new JsonCallback<String>() {
+            @Override
+            public void onSuccess(Response<String> response) {
+                if (!TextUtils.isEmpty(response.body())) {
+
+                    RollListInfo listInfo = GsonConvertUtil.fromJson(response.body(), RollListInfo.class);
+                    if (listInfo.isBizSuccess) {
+                        if (listInfo.data.size() > 0) {
+                            //data = listInfo.data;
+
+                            for (RollListInfo.DataBean dataBean : listInfo.data) {
+
+                                //最新订单来自 黑河 预发***   14秒前
+                                Danmu danmu = new Danmu(0, 1, "Comment", dataBean.imgSrc, "最新订单来自" + dataBean.city + dataBean.nickName + "," + dataBean.second + "秒前");
+                                //Danmu danmu3 = new Danmu(0, 3, "Comment", avatars[2], " 普通：这还是一条弹幕");
+                                danmus.add(danmu);
+                            }
+                            //recordsList = listInfo.records;
+                            //mLiveAdapter.addData(listInfo.records); //展示数据
+                        }
+                    } else {
+                        ToastUtils.showLongToastSafe("请求失败！");
+                    }
+                }
+            }
+
+            @Override
+            public void onError(Response<String> response) {
+                super.onError(response);
+                //ToastUtils.showLongToastSafe("请确认服务器是否开启！");
+            }
+        });
+    }
 }
