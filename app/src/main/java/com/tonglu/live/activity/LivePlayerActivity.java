@@ -33,12 +33,13 @@ import com.tonglu.okhttp.model.Response;
 import com.tonglu.okhttp.utils.OkLogger;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import master.flame.danmaku.controller.IDanmakuView;
+
+import static android.R.attr.handle;
 
 public class LivePlayerActivity extends Activity implements ITXLivePlayListener, View.OnClickListener {
 
@@ -96,7 +97,6 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
     private DanmuControl mDanmuControl;
     private IDanmakuView mDanmakuView;
 
-
     private final int userId = 30224;
 
     /*String[] avatars = {
@@ -130,7 +130,10 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
         mPlayConfig = new TXLivePlayConfig();
         initView();
 
-        getRollList();//请求弹幕信息
+
+        OkLogger.e("TIME--------------------------->" + TIME);
+        handler.postDelayed(runnable, TIME); //每隔s执行一条弹屏信息
+
     }
 
     private void handleIntent() {
@@ -145,7 +148,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
     List<Danmu> danmus = new ArrayList<>();
     int i = 0;
 
-    private int TIME = 15000;//15秒显示一次弹幕信息
+    private int TIME = 7000;//默认8秒
     Handler handler = new Handler();
     Runnable runnable = new Runnable() {
 
@@ -155,6 +158,9 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
             try {
                 handler.postDelayed(this, TIME);
 
+                //TIME = (int) Math.round(Math.random() * (10000 - 400) + 10000);
+                TIME = (int) Math.round(Math.random() * (8000 - 1000) + 9000);
+                OkLogger.e("TIME-------------TIME-------------->" + TIME);
                 //Danmu danmu1 = new Danmu(0, userId, "Comment", avatars[0], " 我：这是一条弹幕");
                 //Danmu danmu2 = new Danmu(0, 1, "Comment", avatars[1], "楼主：这又是一又是一条弹幕");
                 //Danmu danmu3 = new Danmu(0, 3, "Comment", avatars[2], " 普通：这还是一条弹幕");
@@ -167,9 +173,21 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
                 /*******TEST********/
 
 
-                // 添加弹幕
-                mDanmuControl.addDanmu(danmus.get(i++));
-                OkLogger.e("-------------i> " + i);
+                //OkLogger.e("-------------i> " + i++);
+
+                if (danmus.size() > 0) {
+                    if (i >= 20) {
+                        danmus.clear();
+                        i = 0;
+                        OkLogger.e("----------------------------------danmus.clear()---------------------------->");
+                    } else {
+                        // 添加弹幕
+                        mDanmuControl.addDanmu(danmus.get(i++));
+                    }
+                } else {
+                    getRollList();//请求弹幕信息
+                }
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -187,9 +205,6 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
         mDanmuControl.setDanmakuView(mDanmakuView);
         mDanmuControl.setUserId(userId);    //设置用户id，区别背景色
 
-
-        TIME = (int) Math.round(Math.random() * (10000 - 400) + 10000);
-        handler.postDelayed(runnable, TIME); //每隔s执行一条弹屏信息
 //------------------------------------------------------------------------------
 
         mRootView = (LinearLayout) findViewById(R.id.root);
@@ -230,26 +245,6 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
                 mVideoPause = false;
             }
         });
-
-        //日志Log
-        /*mBtnLog = (ImageView) findViewById(R.id.btnLog);
-        mBtnLog.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mLogViewStatus.getVisibility() == View.GONE) {
-                    mLogViewStatus.setVisibility(View.VISIBLE);
-                    //mScrollView.setVisibility(View.VISIBLE);
-                    //mLogViewEvent.setText(mLogMsg);
-                    //scroll2Bottom(mScrollView, mLogViewEvent);
-                    mBtnLog.setImageResource(R.mipmap.log_hidden);
-                } else {
-                    mLogViewStatus.setVisibility(View.GONE);
-                    mScrollView.setVisibility(View.GONE);
-                    mBtnLog.setImageResource(R.mipmap.log_show);
-                }
-            }
-        });*/
-
 
         //缓存策略
         mBtnCacheStrategy = (ImageView) findViewById(R.id.btnCacheStrategy);
@@ -313,20 +308,6 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
         }
     }
 
-
-//------------------------------------------------------------------------------
-
-    /*public static void scroll2Bottom(final ScrollView scroll, final View inner) {
-        if (scroll == null || inner == null) {
-            return;
-        }
-        int offset = inner.getMeasuredHeight() - scroll.getMeasuredHeight();
-        if (offset < 0) {
-            offset = 0;
-        }
-        scroll.scrollTo(0, offset);
-    }*/
-
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -342,6 +323,9 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
 
         OkLogger.e("----------------->vrender onDestroy");
         mDanmuControl.destroy();
+        if (handler != null) {
+            handler = null;
+        }
     }
 
     @Override
@@ -418,25 +402,6 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
         }
         return true;
     }
-
-    /*protected void clearLog() {
-        mLogMsg.setLength(0);
-        //mLogViewEvent.setText("");
-        //mLogViewStatus.setText("");
-    }*/
-
-    /*protected void appendEventLog(int event, String message) {
-        String str = "receive event: " + event + ", " + message;
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
-        String date = sdf.format(System.currentTimeMillis());
-        while (mLogMsg.length() > mLogMsgLenLimit) {
-            int idx = mLogMsg.indexOf("\n");
-            if (idx == 0)
-                idx = 1;
-            mLogMsg = mLogMsg.delete(0, idx);
-        }
-        mLogMsg = mLogMsg.append("\n" + "[" + date + "]" + message);
-    }*/
 
     private boolean startPlayRtmp() {
 //          由于iOS AppStore要求新上架的app必须使用https,所以后续腾讯云的视频连接会支持https,
@@ -551,17 +516,13 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
     @Override
     public void onNetStatus(Bundle status) {
         String str = getNetStatusString(status);
-        //mLogViewStatus.setText(str);
-        OkLogger.e("Current status, CPU:" + status.getString(TXLiveConstants.NET_STATUS_CPU_USAGE) +
+
+        /*OkLogger.e("Current status, CPU:" + status.getString(TXLiveConstants.NET_STATUS_CPU_USAGE) +
                 ", RES:" + status.getInt(TXLiveConstants.NET_STATUS_VIDEO_WIDTH) + "*" + status.getInt(TXLiveConstants.NET_STATUS_VIDEO_HEIGHT) +
                 ", SPD:" + status.getInt(TXLiveConstants.NET_STATUS_NET_SPEED) + "Kbps" +
                 ", FPS:" + status.getInt(TXLiveConstants.NET_STATUS_VIDEO_FPS) +
                 ", ARA:" + status.getInt(TXLiveConstants.NET_STATUS_AUDIO_BITRATE) + "Kbps" +
-                ", VRA:" + status.getInt(TXLiveConstants.NET_STATUS_VIDEO_BITRATE) + "Kbps");
-        //Log.d(TAG, "Current status: " + status.toString());
-//        if (mLivePlayer != null){
-//            mLivePlayer.onLogRecord("[net state]:\n"+str+"\n");
-//        }
+                ", VRA:" + status.getInt(TXLiveConstants.NET_STATUS_VIDEO_BITRATE) + "Kbps");*/
     }
 
     public void setCacheStrategy(int nCacheStrategy) {
@@ -627,7 +588,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
         String url = "http://yfb-dx.591malls.com:5318/api/Order/RollOrderList";
 
         Map<String, String> params = new TreeMap<>();
-        params.put("count", "10");
+        params.put("count", "20");
         params.putAll(CommonBody.getInstance().commonBody());
         String jsonParams = GsonConvertUtil.toJson(params);
 
@@ -639,8 +600,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
                     RollListInfo listInfo = GsonConvertUtil.fromJson(response.body(), RollListInfo.class);
                     if (listInfo.isBizSuccess) {
                         if (listInfo.data.size() > 0) {
-                            //data = listInfo.data;
-
+                            OkLogger.e("listInfo.data.size()-------------------->" + listInfo.data.size());
                             for (RollListInfo.DataBean dataBean : listInfo.data) {
 
                                 //最新订单来自 黑河 预发***   14秒前
@@ -648,11 +608,9 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
                                 //Danmu danmu3 = new Danmu(0, 3, "Comment", avatars[2], " 普通：这还是一条弹幕");
                                 danmus.add(danmu);
                             }
-                            //recordsList = listInfo.records;
-                            //mLiveAdapter.addData(listInfo.records); //展示数据
                         }
                     } else {
-                        ToastUtils.showLongToastSafe("请求失败！");
+                        ToastUtils.showLongToastSafe("弹幕信息请求失败！");
                     }
                 }
             }
