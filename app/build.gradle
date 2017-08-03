@@ -1,5 +1,14 @@
 apply plugin: 'com.android.application'
 
+//定义打包时间函数
+def packageTime() {
+    return new Date().format("yyyy-MM-dd-HH-mm", TimeZone.getTimeZone("UTC"))
+}
+
+//获取local.properties的内容
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
 android {
 
     compileSdkVersion var.compileSdkVersion
@@ -19,11 +28,48 @@ android {
         }
     }
 
+    signingConfigs {
+
+        releaseConfig {
+            //签名相关的信息,直接写在gradle不利于安全，把这些信息写到工程主module根目录下的local.properties文件
+            // relase签名----在local.properties 文件里面配置
+            storeFile file(properties.getProperty("keystroe_storeFile"))
+            storePassword properties.getProperty("keystroe_storePassword")
+            keyAlias properties.getProperty("keystroe_keyAlias")
+            keyPassword properties.getProperty("keystroe_keyPassword")
+        }
+
+    }
 
     buildTypes {
         release {
+            // 开启ZipAlign优化
+            zipAlignEnabled true
+            // 移除无用的resource文件
+            shrinkResources true
+            // 使用release签名
+            signingConfig signingConfigs.releaseConfig
+
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        debug {
+            signingConfig signingConfigs.releaseConfig
+        }
+    }
+
+    //输出APK
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            def outputFile = output.outputFile
+            if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                File outputDirectory = new File(outputFile.parent);
+
+                def fileName = "app_v${defaultConfig.versionName}_release.apk"
+                //def fileName = "app_v${defaultConfig.versionName}_${packageTime()}_release.apk"
+                output.outputFile = new File(outputDirectory, fileName)
+            }
         }
     }
 }

@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.tencent.rtmp.TXLivePusher;
 import com.tonglu.live.manager.GenericRequestManager;
+import com.tonglu.live.utils.ToastUtils;
 
 public class AppApplication extends Application {
 
@@ -12,8 +13,8 @@ public class AppApplication extends Application {
 
     @Override
     public void onCreate() {
+        ToastUtils.showLongToastSafe("------应用进入------");
         super.onCreate();
-
         instance = this;
 
         GenericRequestManager.initialize(this);

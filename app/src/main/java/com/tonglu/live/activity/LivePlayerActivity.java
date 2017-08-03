@@ -604,8 +604,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
                             for (RollListInfo.DataBean dataBean : listInfo.data) {
 
                                 //最新订单来自 黑河 预发***   14秒前
-                                Danmu danmu = new Danmu(0, 1, "Comment", dataBean.imgSrc, "最新订单来自" + dataBean.city + dataBean.nickName + "," + dataBean.second + "秒前");
-                                //Danmu danmu3 = new Danmu(0, 3, "Comment", avatars[2], " 普通：这还是一条弹幕");
+                                Danmu danmu = new Danmu(0, 1, "Comment", dataBean.imgSrc, "最新订单来自" + dataBean.city + dataBean.nickName + "，" + dataBean.second + "秒前");
                                 danmus.add(danmu);
                             }
                         }

@@ -12,6 +12,12 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.CAMERA" />
 
+    <uses-feature
+
+        android:name="android.hardware.type.television"
+        android:required="true" />
+
+
     <uses-feature android:name="android.hardware.Camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
@@ -23,7 +29,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.MainActivity"
+        <activity
+            android:name=".activity.MainActivity"
             android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -34,13 +41,13 @@
 
         <meta-data
             android:name="app.server"
-            android:value="http://10.38.50.9:8525"/>
+            android:value="http://zb.591malls.com" />
 
         <activity
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
             android:name=".activity.LivePlayerActivity"
             android:label="播放页面"
-            android:screenOrientation="landscape" />
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
     </application>
 
 </manifest>
