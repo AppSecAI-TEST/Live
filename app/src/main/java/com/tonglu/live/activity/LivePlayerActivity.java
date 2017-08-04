@@ -43,6 +43,9 @@ import static android.R.attr.handle;
 
 public class LivePlayerActivity extends Activity implements ITXLivePlayListener, View.OnClickListener {
 
+
+
+
     private TXLivePlayer mLivePlayer = null;
     private boolean mVideoPlay;
     private TXCloudVideoView mPlayerView;

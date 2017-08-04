@@ -5,10 +5,13 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.tonglu.live.R;
+import com.tonglu.live.adapter.DividerItemDecoration;
 import com.tonglu.live.adapter.LiveAdapter;
 import com.tonglu.live.base.BaseTitleActivity;
 import com.tonglu.live.callback.StringDialogCallback;
@@ -26,6 +29,7 @@ import java.util.TreeMap;
 
 public class MainActivity extends BaseTitleActivity {
 
+
     private RecyclerView mRecyclerView;
     private LiveAdapter mLiveAdapter;
     public List<LiveListInfo.RecordsBean> recordsList;
@@ -39,13 +43,20 @@ public class MainActivity extends BaseTitleActivity {
         mRecyclerView = findView(R.id.rv_list);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         mLiveAdapter = new LiveAdapter();
+
+        //获取直播地址
+        /*String TestUrl = "rtmp://live.otofuturestore.com/malls/dianneizhibo_lld?auth_key=1502862908-0-0-10a6fabad2fb2b3c2ec01545c06bddc7";
+        Intent intent = new Intent(MainActivity.this, LivePlayerActivity.class);
+        intent.putExtra("url_address", TestUrl);
+        startActivity(intent);*/
+
+
         mLiveAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 //ToastUtils.showLongToastSafe(position + "");
-
                 //获取直播地址
                 String url = recordsList.get(position).urls.get(0).url;
                 //OkLogger.e(url);
@@ -56,7 +67,6 @@ public class MainActivity extends BaseTitleActivity {
         });
 
         getLiveList();  //请求直播地址
-
         mRecyclerView.setAdapter(mLiveAdapter);
 
     }
@@ -97,10 +107,36 @@ public class MainActivity extends BaseTitleActivity {
             @Override
             public void onError(Response<String> response) {
                 super.onError(response);
-                ToastUtils.showLongToastSafe("请确认服务器是否开启！");
+                ToastUtils.showLongToastSafe("请确认服务器是否开启及网络是否连接！");
             }
         });
     }
 
+
+    private long exitTime = 0;  //退出时间
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {    //按向下键
+            return true;
+        } else if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {   // 按向上键
+            return true;
+        } else if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) { //按向左键
+            return true;
+        } else if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {    //按向右键
+            return true;
+        } else if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
+            if ((System.currentTimeMillis() - exitTime) > 1900) {
+                ToastUtils.showShortToastSafe("再按一次退出");
+                exitTime = System.currentTimeMillis();
+            } else {
+                finish();
+                System.exit(0);
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
 }

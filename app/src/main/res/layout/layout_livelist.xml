@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
+    android:background="@drawable/selector"
     android:padding="15dp">
 
     <!--<ImageView
@@ -70,12 +70,5 @@
         android:textColor="@color/colorPrimaryDark"
         android:textSize="20sp"
         tools:text="视频类型" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:layout_below="@+id/tv_vedio_url"
-        android:layout_marginTop="10dp"
-        android:background="@color/gray_CCCCCC" />
 
 </RelativeLayout>
