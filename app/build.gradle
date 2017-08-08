@@ -44,9 +44,9 @@ android {
     buildTypes {
         release {
             // 开启ZipAlign优化
-            zipAlignEnabled true
+            //zipAlignEnabled true
             // 移除无用的resource文件
-            shrinkResources true
+            //shrinkResources true
             // 使用release签名
             signingConfig signingConfigs.releaseConfig
 

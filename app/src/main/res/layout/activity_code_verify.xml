@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_login_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:background="@mipmap/ic_user_login_background">
+
+        <com.tonglu.live.widgets.SecretTextView
+            android:id="@+id/secret_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/app_name"
+            android:textColor="@color/white"
+            android:textSize="76px" />
+
+    </RelativeLayout>
+
+
+    <EditText
+        android:id="@+id/et_phone_number"
+        android:layout_width="match_parent"
+        android:layout_height="96px"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="30px"
+        android:drawableLeft="@mipmap/ic_user_password"
+        android:drawablePadding="54px"
+        android:hint="请输入直播密码"
+        android:inputType="number"
+        android:paddingLeft="50px"
+        android:textColor="@color/black"
+        android:textColorHint="@color/gray_666666"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/tv_login"
+        android:layout_width="match_parent"
+        android:layout_height="96px"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/rectangle_27dp_blue"
+        android:gravity="center"
+        android:text="确定"
+        android:textColor="@android:color/white"
+        android:textSize="20sp" />
+
+</LinearLayout>

@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.tonglu.live.AppApplication;
 import com.tonglu.live.R;
 import com.tonglu.live.adapter.DividerItemDecoration;
 import com.tonglu.live.adapter.LiveAdapter;
@@ -21,6 +22,7 @@ import com.tonglu.live.utils.Constants;
 import com.tonglu.live.utils.GsonConvertUtil;
 import com.tonglu.live.utils.MD5Utils;
 import com.tonglu.live.utils.ToastUtils;
+import com.tonglu.live.utils.ValidateUtils;
 import com.tonglu.okhttp.model.Response;
 
 import java.util.List;
@@ -28,7 +30,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class MainActivity extends BaseTitleActivity {
-
 
     private RecyclerView mRecyclerView;
     private LiveAdapter mLiveAdapter;
@@ -47,7 +48,7 @@ public class MainActivity extends BaseTitleActivity {
         mLiveAdapter = new LiveAdapter();
 
         //获取直播地址
-        /*String TestUrl = "rtmp://live.otofuturestore.com/malls/dianneizhibo_lld?auth_key=1502862908-0-0-10a6fabad2fb2b3c2ec01545c06bddc7";
+       /* String TestUrl = "rtmp://live.otofuturestore.com/malls/dianneizhibo_lld?auth_key=1502862908-0-0-10a6fabad2fb2b3c2ec01545c06bddc7";
         Intent intent = new Intent(MainActivity.this, LivePlayerActivity.class);
         intent.putExtra("url_address", TestUrl);
         startActivity(intent);*/
@@ -66,7 +67,13 @@ public class MainActivity extends BaseTitleActivity {
             }
         });
 
-        getLiveList();  //请求直播地址
+        //判断网络是否可用
+        if (ValidateUtils.isNetworkConnected(AppApplication.getInstance())) {
+            getLiveList();  //请求直播地址
+        } else {
+            ToastUtils.showLongToastSafe("请确认网络是否可用!");
+        }
+
         mRecyclerView.setAdapter(mLiveAdapter);
 
     }

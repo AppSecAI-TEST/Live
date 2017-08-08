@@ -16,7 +16,6 @@
         android:name="android.hardware.type.television"
         android:required="true" />
 
-
     <uses-feature android:name="android.hardware.Camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
@@ -28,7 +27,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activity.MainActivity"
+            android:name=".activity.VerifyCodeActivity"
             android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -46,6 +45,11 @@
             android:label="播放页面"
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+
+        <activity
+            android:name=".activity.MainActivity"
+            android:label="直播列表"
+            android:screenOrientation="landscape"/>
     </application>
 
 </manifest>

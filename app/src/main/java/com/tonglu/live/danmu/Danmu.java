@@ -4,10 +4,11 @@ package com.tonglu.live.danmu;
  * 弹幕实体类
  */
 public class Danmu {
-    public long   id;
-    public int    userId;
+
+    public long id;
+    public int userId;
     public String type;
-    public int    avatarUrl;
+    public int avatarUrl;
     public String content;
 
     public String imgUrl;
@@ -16,7 +17,6 @@ public class Danmu {
         this.id = id;
         this.userId = userId;
         this.type = type;
-        this.avatarUrl = avatarUrl;
         this.content = content;
         this.imgUrl = imgUrl;
     }

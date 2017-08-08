@@ -8,9 +8,7 @@ import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -39,12 +37,7 @@ import java.util.TreeMap;
 
 import master.flame.danmaku.controller.IDanmakuView;
 
-import static android.R.attr.handle;
-
-public class LivePlayerActivity extends Activity implements ITXLivePlayListener, View.OnClickListener {
-
-
-
+public class LivePlayerActivity extends Activity implements ITXLivePlayListener {
 
     private TXLivePlayer mLivePlayer = null;
     private boolean mVideoPlay;
@@ -53,19 +46,15 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
     private boolean mHWDecode = false;
     private LinearLayout mRootView;
 
-    //private ImageView mBtnLog;
-    private ImageView mBtnPlay;
-    //private ScrollView mScrollView;
-
-    private static final int CACHE_STRATEGY_FAST = 1;  //极速
-    private static final int CACHE_STRATEGY_SMOOTH = 2;  //流畅
+    //private static final int CACHE_STRATEGY_FAST = 1;  //极速
+    //private static final int CACHE_STRATEGY_SMOOTH = 2;  //流畅
     private static final int CACHE_STRATEGY_AUTO = 3;  //自动
 
     private static final float CACHE_TIME_FAST = 1.0f;
     private static final float CACHE_TIME_SMOOTH = 5.0f;
 
-    private static final float CACHE_TIME_AUTO_MIN = 5.0f;
-    private static final float CACHE_TIME_AUTO_MAX = 10.0f;
+    //private static final float CACHE_TIME_AUTO_MIN = 5.0f;
+    //private static final float CACHE_TIME_AUTO_MAX = 10.0f;
 
     //public static final int ACTIVITY_TYPE_PUBLISH = 1;
     public static final int ACTIVITY_TYPE_LIVE_PLAY = 2;
@@ -73,17 +62,6 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
     //public static final int ACTIVITY_TYPE_LINK_MIC = 4;
 
     private int mCacheStrategy = 0;
-    private ImageView mBtnCacheStrategy;
-    private Button mRatioFast;
-    private Button mRatioSmooth;
-    private Button mRatioAuto;
-    private ImageView mBtnStop;
-    private LinearLayout mLayoutCacheStrategy;
-
-    //public TextView mLogViewStatus;
-    //public TextView mLogViewEvent;
-    protected StringBuffer mLogMsg = new StringBuffer("");
-    private final int mLogMsgLenLimit = 3000;
 
     private int mCurrentRenderMode;
     private int mCurrentRenderRotation;
@@ -112,7 +90,6 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         super.setContentView(R.layout.activity_play);
 
@@ -132,7 +109,6 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
         mActivityType = getIntent().getIntExtra("PLAY_TYPE", ACTIVITY_TYPE_LIVE_PLAY);
         mPlayConfig = new TXLivePlayConfig();
         initView();
-
 
         OkLogger.e("TIME--------------------------->" + TIME);
         handler.postDelayed(runnable, TIME); //每隔s执行一条弹屏信息
@@ -175,7 +151,6 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
                 //danmus.remove(0);
                 /*******TEST********/
 
-
                 //OkLogger.e("-------------i> " + i++);
 
                 if (danmus.size() > 0) {
@@ -198,8 +173,6 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
     };
 
     void initView() {
-        //mLogViewEvent = (TextView) findViewById(R.id.logViewEvent);
-        //mLogViewStatus = (TextView) findViewById(R.id.logViewStatus);
 
 //------------------------------------------------------------------------------
         mDanmakuView = (IDanmakuView) findViewById(R.id.danmakuView);
@@ -220,90 +193,21 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
         mLoadingView = (ImageView) findViewById(R.id.loadingImageView);
 
         mVideoPlay = false; //默认设置为False
-        //mLogViewStatus.setVisibility(View.GONE);
-        //mLogViewStatus.setMovementMethod(new ScrollingMovementMethod());
-        //mLogViewEvent.setMovementMethod(new ScrollingMovementMethod());
-        //mScrollView = (ScrollView) findViewById(R.id.scrollview);
-        //mScrollView.setVisibility(View.GONE);
-
-        //点击播放
-        mBtnPlay = (ImageView) findViewById(R.id.btnPlay);
-        mBtnPlay.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                OkLogger.e("click playbtn isplay:" + mVideoPlay + " ispause:" + mVideoPause + " playtype:" + mPlayType);
-                toPlay();
-            }
-        });
 
         toPlay();//播放
 
-        //停止按钮(不保留最后一帧，直接停止)
-        mBtnStop = (ImageView) findViewById(R.id.btnStop);
-        mBtnStop.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                stopPlayRtmp();
-                mVideoPlay = false;
-                mVideoPause = false;
-            }
-        });
-
-        //缓存策略
-        mBtnCacheStrategy = (ImageView) findViewById(R.id.btnCacheStrategy);
-        mLayoutCacheStrategy = (LinearLayout) findViewById(R.id.layoutCacheStrategy);
-        mBtnCacheStrategy.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mLayoutCacheStrategy.setVisibility(mLayoutCacheStrategy.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
-            }
-        });
-
         this.setCacheStrategy(CACHE_STRATEGY_AUTO);
-
-        mRatioFast = (Button) findViewById(R.id.radio_btn_fast);
-        mRatioFast.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                LivePlayerActivity.this.setCacheStrategy(CACHE_STRATEGY_FAST);
-                mLayoutCacheStrategy.setVisibility(View.GONE);
-            }
-        });
-
-        mRatioSmooth = (Button) findViewById(R.id.radio_btn_smooth);
-        mRatioSmooth.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                LivePlayerActivity.this.setCacheStrategy(CACHE_STRATEGY_SMOOTH);
-                mLayoutCacheStrategy.setVisibility(View.GONE);
-            }
-        });
-
-        mRatioAuto = (Button) findViewById(R.id.radio_btn_auto);
-        mRatioAuto.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                LivePlayerActivity.this.setCacheStrategy(CACHE_STRATEGY_AUTO);
-                mLayoutCacheStrategy.setVisibility(View.GONE);
-            }
-        });
-
-        View view = mPlayerView.getRootView();
-        view.setOnClickListener(this);
     }
 
     private void toPlay() {
         if (mVideoPlay) {
             if (mVideoPause) {
                 mLivePlayer.resume();
-                mBtnPlay.setImageResource(R.mipmap.play_pause);
                 mRootView.setBackgroundColor(0xff000000);
             } else {
                 mLivePlayer.pause();
-                mBtnPlay.setImageResource(R.mipmap.play_start);
             }
             mVideoPause = !mVideoPause;
-
         } else {
             if (startPlayRtmp()) {
                 mVideoPlay = !mVideoPlay;
@@ -357,7 +261,6 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
     @Override
     public void onResume() {
         super.onResume();
-
         if (mVideoPlay && !mVideoPause) {
             if (mLivePlayer != null) {
                 mLivePlayer.resume();
@@ -370,14 +273,6 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
 
         //danmu生命周期
         mDanmuControl.resume();
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            default:
-                mLayoutCacheStrategy.setVisibility(View.GONE);
-        }
     }
 
     private boolean checkPlayUrl(final String playUrl) {
@@ -417,14 +312,6 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
             return false;
         }
 
-        //clearLog();
-
-        int[] ver = TXLivePlayer.getSDKVersion();
-        if (ver != null && ver.length >= 4) {
-            mLogMsg.append(String.format("rtmp sdk version:%d.%d.%d.%d ", ver[0], ver[1], ver[2], ver[3]));
-            //mLogViewEvent.setText(mLogMsg);
-        }
-        mBtnPlay.setImageResource(R.mipmap.play_pause);
         mRootView.setBackgroundColor(0xff000000);
 
         mLivePlayer.setPlayerView(mPlayerView);
@@ -445,13 +332,11 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
         int result = mLivePlayer.startPlay(mUrlAddress, mPlayType); // result返回值：0 success;  -1 empty url; -2 invalid url; -3 invalid playType;
 
         if (result != 0) {
-            mBtnPlay.setImageResource(R.mipmap.play_start);
             mRootView.setBackgroundResource(R.mipmap.main_bkg);
             return false;
         }
 
         //appendEventLog(0, "点击播放按钮！播放类型：" + mPlayType);
-
         startLoadingAnimation();
 
         mStartPlayTS = System.currentTimeMillis();
@@ -460,7 +345,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
 
     private void stopPlayRtmp() {
 
-        mBtnPlay.setImageResource(R.mipmap.play_start);
+        //mBtnPlay.setImageResource(R.mipmap.play_start);
         mRootView.setBackgroundResource(R.mipmap.main_bkg);
         stopLoadingAnimation();
         if (mLivePlayer != null) {
@@ -500,7 +385,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
     }
 
     //公用打印辅助函数
-    protected String getNetStatusString(Bundle status) {
+    /*protected String getNetStatusString(Bundle status) {
         String str = String.format("%-14s %-14s %-12s\n%-14s %-14s %-12s\n%-14s %-14s %-12s\n%-14s %-12s",
                 "CPU:" + status.getString(TXLiveConstants.NET_STATUS_CPU_USAGE),
                 "RES:" + status.getInt(TXLiveConstants.NET_STATUS_VIDEO_WIDTH) + "*" + status.getInt(TXLiveConstants.NET_STATUS_VIDEO_HEIGHT),
@@ -514,13 +399,13 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
                 "SVR:" + status.getString(TXLiveConstants.NET_STATUS_SERVER_IP),
                 "AVRA:" + status.getInt(TXLiveConstants.NET_STATUS_SET_VIDEO_BITRATE));
         return str;
-    }
+    }*/
 
     @Override
     public void onNetStatus(Bundle status) {
-        String str = getNetStatusString(status);
+        /*String str = getNetStatusString(status);
 
-        /*OkLogger.e("Current status, CPU:" + status.getString(TXLiveConstants.NET_STATUS_CPU_USAGE) +
+        OkLogger.e("Current status, CPU:" + status.getString(TXLiveConstants.NET_STATUS_CPU_USAGE) +
                 ", RES:" + status.getInt(TXLiveConstants.NET_STATUS_VIDEO_WIDTH) + "*" + status.getInt(TXLiveConstants.NET_STATUS_VIDEO_HEIGHT) +
                 ", SPD:" + status.getInt(TXLiveConstants.NET_STATUS_NET_SPEED) + "Kbps" +
                 ", FPS:" + status.getInt(TXLiveConstants.NET_STATUS_VIDEO_FPS) +
@@ -533,7 +418,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
         mCacheStrategy = nCacheStrategy;
 
         switch (nCacheStrategy) {
-            case CACHE_STRATEGY_FAST:
+            /*case CACHE_STRATEGY_FAST:
                 mPlayConfig.setAutoAdjustCacheTime(true);
                 mPlayConfig.setMaxAutoAdjustCacheTime(CACHE_TIME_FAST);
                 mPlayConfig.setMinAutoAdjustCacheTime(CACHE_TIME_FAST);
@@ -544,7 +429,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
                 mPlayConfig.setAutoAdjustCacheTime(false);
                 mPlayConfig.setCacheTime(CACHE_TIME_SMOOTH);
                 mLivePlayer.setConfig(mPlayConfig);
-                break;
+                break;*/
 
             case CACHE_STRATEGY_AUTO:
                 mPlayConfig.setAutoAdjustCacheTime(true);
@@ -557,6 +442,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
                 break;
         }
     }
+
 
     private void startLoadingAnimation() {
         if (mLoadingView != null) {
@@ -588,7 +474,8 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
 
     //获取直播列表(默认请求30条弹幕信息)
     private void getRollList() {
-        String url = "http://yfb-dx.591malls.com:5318/api/Order/RollOrderList";
+        //String url = "http://yfb-dx.591malls.com:5318/api/Order/RollOrderList";
+        String url = "http://preferentialfapi.591malls.com/api/Order/RollOrderList";
 
         Map<String, String> params = new TreeMap<>();
         params.put("count", "20");
@@ -606,8 +493,14 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener,
                             OkLogger.e("listInfo.data.size()-------------------->" + listInfo.data.size());
                             for (RollListInfo.DataBean dataBean : listInfo.data) {
 
-                                //最新订单来自 黑河 预发***   14秒前
-                                Danmu danmu = new Danmu(0, 1, "Comment", dataBean.imgSrc, "最新订单来自" + dataBean.city + dataBean.nickName + "，" + dataBean.second + "秒前");
+                                //最新订单来自 黑河 张***   14 秒前
+                                //Danmu danmu = new Danmu(0, 1, "Comment", dataBean.imgSrc, "最新订单来自" + dataBean.city + " " + dataBean.nickName + "，" + dataBean.second + " 秒前");
+                                Danmu danmu = new Danmu();
+                                danmu.id = 0;
+                                danmu.userId = 1;
+                                danmu.type = "Comment";
+                                danmu.imgUrl = dataBean.imgSrc;
+                                danmu.content = "最新订单来自" + dataBean.city + " " + dataBean.nickName + "，" + dataBean.second + " 秒前";
                                 danmus.add(danmu);
                             }
                         }

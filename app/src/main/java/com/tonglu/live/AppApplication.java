@@ -13,7 +13,6 @@ public class AppApplication extends Application {
 
     @Override
     public void onCreate() {
-        ToastUtils.showLongToastSafe("------应用进入------");
         super.onCreate();
         instance = this;
 
