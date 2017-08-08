@@ -86,7 +86,7 @@ public class VerifyCodeActivity extends BaseActivity {
 
         //********************* 界面字体LOGO动画-暂定 *************************
         secretTextView = findView(R.id.secret_tv);
-        secretTextView.setDuration(2500);
+        secretTextView.setDuration(2800);
         //secretTextView.setIsVisible(true);
         secretTextView.show();
         //secretTextView.setOnClickListener(new FastClickListener());
@@ -104,7 +104,7 @@ public class VerifyCodeActivity extends BaseActivity {
         //设置一个定时器，处理软键盘上弹和TextView动画冲突问题
         if (secretTextView.getIsVisible()) {
             Timer timer = new Timer();
-            timer.schedule(task, 2500);
+            timer.schedule(task, 2800);
         }
     }
 

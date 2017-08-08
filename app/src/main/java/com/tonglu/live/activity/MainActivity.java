@@ -118,23 +118,21 @@ public class MainActivity extends BaseTitleActivity {
         });
     }
 
-
     private long exitTime = 0;  //退出时间
-
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
         if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {    //按向下键
-            ToastUtils.showShortToastSafe("按向下键");
+            //ToastUtils.showShortToastSafe("按向下键");
             //return true;
         } else if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {   // 按向上键
-            ToastUtils.showShortToastSafe("按向上键");
+            //ToastUtils.showShortToastSafe("按向上键");
             //return true;
         } else if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) { //按向左键
-            ToastUtils.showShortToastSafe("按向左键");
+            //ToastUtils.showShortToastSafe("按向左键");
             //return true;
         } else if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {    //按向右键
-            ToastUtils.showShortToastSafe("按向右键");
+            //ToastUtils.showShortToastSafe("按向右键");
             //return true;
         } else if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
             if ((System.currentTimeMillis() - exitTime) > 1900) {
@@ -148,5 +146,4 @@ public class MainActivity extends BaseTitleActivity {
         }
         return super.onKeyDown(keyCode, event);
     }
-
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- 按下后的显示效果 -->
-    <item android:state_pressed="true">
+    <!-- 焦点获取后的显示效果 -->
+    <item android:state_focused="true">
         <color android:color="@color/gray_CCCCCC" />
     </item>
     <!-- 正常情况下的效果 -->
