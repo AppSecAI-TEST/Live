@@ -7,10 +7,9 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.tonglu.live.AppApplication;
+import com.tonglu.live.AppAplication;
 import com.tonglu.live.R;
 import com.tonglu.live.adapter.DividerItemDecoration;
 import com.tonglu.live.adapter.LiveAdapter;
@@ -68,7 +67,7 @@ public class MainActivity extends BaseTitleActivity {
         });
 
         //判断网络是否可用
-        if (ValidateUtils.isNetworkConnected(AppApplication.getInstance())) {
+        if (ValidateUtils.isNetworkConnected(AppAplication.getInstance())) {
             getLiveList();  //请求直播地址
         } else {
             ToastUtils.showLongToastSafe("请确认网络是否可用!");

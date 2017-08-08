@@ -9,7 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
 
-import com.tonglu.live.AppApplication;
+import com.tonglu.live.AppAplication;
 import com.tonglu.live.R;
 
 
@@ -245,7 +245,7 @@ public class ToastUtils {
      */
     private static void showToast(@StringRes int resId, int duration, Object... args) {
 
-        showToast(String.format(AppApplication.getInstance().getResources().getString(resId), args), duration);
+        showToast(String.format(AppAplication.getInstance().getResources().getString(resId), args), duration);
     }
 
     /**
@@ -268,7 +268,7 @@ public class ToastUtils {
     private static void showToast(CharSequence text, int duration) {
         if (isJumpWhenMore) cancelToast();
         if (sToast == null) {
-            sToast = Toast.makeText(AppApplication.getInstance(), text, duration);
+            sToast = Toast.makeText(AppAplication.getInstance(), text, duration);
         } else {
             sToast.setText(text);
             sToast.setDuration(duration);

@@ -16,13 +16,25 @@
         android:name="android.hardware.type.television"
         android:required="true" />
 
-    <uses-feature android:name="android.hardware.Camera" />
-    <uses-feature android:name="android.hardware.camera.autofocus" />
+
+    <!-- 仅仅在TV上运行设置为true，在TV和phone上运行设置为false。 -->
+    <uses-feature
+        android:name="android.software.leanback"
+        android:required="false"/>
+
+    <!-- 运行在TV设备上的应用不依靠触屏去输入 -->
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+
+
 
     <application
-        android:name=".AppApplication"
+        android:name=".AppAplication"
         android:allowBackup="true"
+        android:banner="@mipmap/ic_launcher"
         android:icon="@mipmap/ic_launcher"
+        android:logo="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
@@ -33,6 +45,9 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+                <!--这个filter表明你的应用是在TV上可用，并且为Google Play上发布TV应用所必须。
+                定义这个intent也意味着点击主屏幕的应用图标时，就是打开的这个activity。-->
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
         </activity>
 
@@ -49,7 +64,7 @@
         <activity
             android:name=".activity.MainActivity"
             android:label="直播列表"
-            android:screenOrientation="landscape"/>
+            android:screenOrientation="landscape" />
     </application>
 
 </manifest>

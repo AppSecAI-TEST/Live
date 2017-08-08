@@ -14,7 +14,7 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.tonglu.live.AppApplication;
+import com.tonglu.live.AppAplication;
 import com.tonglu.live.R;
 import com.tonglu.live.base.BaseActivity;
 import com.tonglu.live.base.SystemBarTintManager;
@@ -59,7 +59,7 @@ public class VerifyCodeActivity extends BaseActivity {
         initView();
 
         //提示网络连接不可用
-        if (!ValidateUtils.isNetworkConnected(AppApplication.getInstance())) {
+        if (!ValidateUtils.isNetworkConnected(AppAplication.getInstance())) {
             //mSVProgressHUD.showInfoWithStatus("网络不可用",SVProgressHUD.SVProgressHUDMaskType.None);
             //mSVProgressHUD.showErrorWithStatus("网络未连接",SVProgressHUD.SVProgressHUDMaskType.None);
         }
@@ -86,7 +86,7 @@ public class VerifyCodeActivity extends BaseActivity {
 
         //********************* 界面字体LOGO动画-暂定 *************************
         secretTextView = findView(R.id.secret_tv);
-        secretTextView.setDuration(3000);
+        secretTextView.setDuration(2500);
         //secretTextView.setIsVisible(true);
         secretTextView.show();
         //secretTextView.setOnClickListener(new FastClickListener());
@@ -104,9 +104,8 @@ public class VerifyCodeActivity extends BaseActivity {
         //设置一个定时器，处理软键盘上弹和TextView动画冲突问题
         if (secretTextView.getIsVisible()) {
             Timer timer = new Timer();
-            timer.schedule(task, 3000);
+            timer.schedule(task, 2500);
         }
-
     }
 
     //TextView动画显示完，设置输入框的状态和软键盘弹出动态计算高度
@@ -193,29 +192,7 @@ public class VerifyCodeActivity extends BaseActivity {
         UserRequestManager.getInstance().loginGo(this, str, new DialogCallback<BaseResponse<List<UserLoginToModle>>>(this) {
             @Override
             public void onSuccess(BaseResponse<List<UserLoginToModle>> baseResponse, Call call, Response response) {
-                pass = 0;
-                if (baseResponse.successed) {
-                    if (baseResponse.data.size() == 0) {
-                        startActivity(new Intent(VerifyCodeActivity.this, UserNoJoinEnterpriseActivity.class));
 
-                    } else if (baseResponse.data.size() == 1) {
-                        companyID = baseResponse.data.get(0).companyID;
-                        login();
-                    } else {
-                        Intent intent = new Intent();
-                        intent.putExtra("infoList", (Serializable) baseResponse.data);
-                        intent.setClass(VerifyCodeActivity.this, UserEnterpriseListActivity.class);
-                        startActivity(intent);
-                    }
-
-                } else if (baseResponse.status == ResultErrorCode.CODE_LOGIN_THREE) {
-                    //如果服务器返回的status=402，显示图片验证码，否则不显示
-                    rl_picture_code_layout.setVisibility(View.VISIBLE);
-                    tv_login.setBackgroundResource(R.drawable.rectangle_27dp_blue);
-                    tv_login.setClickable(false);
-                } else {
-                    ToastUtils.showToastShort(baseResponse.message.get(0).msg);
-                }
             }
 
             @Override

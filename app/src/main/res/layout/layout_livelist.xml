@@ -14,7 +14,7 @@
         android:layout_alignParentLeft="true"
         android:layout_centerInParent="true"
         android:padding="5dp"
-        android:src="@mipmap/play_start" />
+        android:src="@mipmap/ic_play_action_normal" />
 
     <TextView
         android:id="@+id/tv_address"
@@ -60,7 +60,7 @@
         android:layout_alignBottom="@+id/tv_address"
         android:layout_alignParentRight="true"
         android:layout_marginRight="30dp"
-        android:textColor="@android:color/holo_blue_dark"
+        android:textColor="@color/colorPrimaryDark"
         android:textSize="20sp"
         tools:text="视频类型" />
 

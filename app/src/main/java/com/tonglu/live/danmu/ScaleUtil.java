@@ -11,7 +11,7 @@ import android.util.TypedValue;
 import android.view.Display;
 import android.view.WindowManager;
 
-import com.tonglu.live.AppApplication;
+import com.tonglu.live.AppAplication;
 
 /**
  * 屏幕的相关类
@@ -20,7 +20,7 @@ public final class ScaleUtil {
     private static Point displaySize;
 
     private static Context getContext() {
-        return AppApplication.getInstance();
+        return AppAplication.getInstance();
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
