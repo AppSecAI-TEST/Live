@@ -27,7 +27,6 @@ import com.tonglu.live.manager.CommonBody;
 import com.tonglu.live.manager.GenericRequestManager;
 import com.tonglu.live.manager.URL;
 import com.tonglu.live.model.CheckInfo;
-import com.tonglu.live.model.LiveListInfo;
 import com.tonglu.live.model.RollListInfo;
 import com.tonglu.live.utils.GsonConvertUtil;
 import com.tonglu.live.utils.MD5Utils;
@@ -79,21 +78,19 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
     //-------------------弹幕相关属性
     private DanmuControl mDanmuControl;
     private IDanmakuView mDanmakuView;
-    //private boolean isStartDM;
     private List<Danmu> danmus = new ArrayList<>();
     private int i = 0;
     private int TIME = 7000;//默认7秒
     private static Handler mHandler;
 
 
-    private final int userId = 30224;
+    //private final int userId = 30224;
 
     /*String[] avatars = {
             "http://upload.cguoguo.com/upload/2016-02-29/56d45c8f21dac.jpg",
             "http://upload.cguoguo.com/upload/2015-12-22/5678f5f3e64dd.jpg",
             "http://upload.cguoguo.com/upload/def.jpg"
     };*/
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -121,6 +118,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
 
         OkLogger.e("TIME--------------------------->" + TIME);
         if (mHandler == null) {
+            //保证 mHandler 不为空
             mHandler = new Handler();
         }
         mHandler.postDelayed(runnable, TIME); //每隔s执行一条弹屏信息
@@ -148,17 +146,6 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
                 //TIME = (int) Math.round(Math.random() * (10000 - 400) + 10000);
                 TIME = (int) Math.round(Math.random() * (8000 - 1000) + 9000);
                 OkLogger.e("TIME-------------TIME-------------->" + TIME);
-                //Danmu danmu1 = new Danmu(0, userId, "Comment", avatars[0], " 我：这是一条弹幕");
-                //Danmu danmu2 = new Danmu(0, 1, "Comment", avatars[1], "楼主：这又是一又是一条弹幕");
-                //Danmu danmu3 = new Danmu(0, 3, "Comment", avatars[2], " 普通：这还是一条弹幕");
-                //danmus.add(danmu1);
-                //danmus.add(danmu2);
-                //danmus.add(danmu3);
-                //Collections.shuffle(danmus);
-                //danmus.remove(0);
-                //danmus.remove(0);
-                /*******TEST********/
-
                 OkLogger.e("-------------i> " + i);
 
                 //danmus.size() > 0 说明有数据，否则需要请求弹幕信息
@@ -173,10 +160,6 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
                     }
                 } else {
                     CheckStartDM(); //检测弹幕是否开启
-
-                   /* if (isStartDM) {
-                        getRollList();  //请求弹幕信息
-                    }*/
                 }
 
             } catch (Exception e) {
@@ -192,7 +175,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
 
         mDanmuControl = new DanmuControl(this); //设置弹幕视图
         mDanmuControl.setDanmakuView(mDanmakuView);
-        mDanmuControl.setUserId(userId);    //设置用户id，区别背景色
+        //mDanmuControl.setUserId(userId);    //设置用户id，区别背景色
 
 //------------------------------------------------------------------------------
 
@@ -352,7 +335,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
             return false;
         }
 
-        //appendEventLog(0, "点击播放按钮！播放类型：" + mPlayType);
+        OkLogger.e("点击播放按钮！播放类型：" + mPlayType);
         startLoadingAnimation();
 
         mStartPlayTS = System.currentTimeMillis();
@@ -445,13 +428,23 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
                             OkLogger.e("listInfo.data.size()-------------------->" + listInfo.data.size());
                             for (RollListInfo.DataBean dataBean : listInfo.data) {
 
-                                //最新订单来自 黑河 张***   14 秒前
-                                //Danmu danmu = new Danmu(0, 1, "Comment", dataBean.imgSrc, "最新订单来自" + dataBean.city + " " + dataBean.nickName + "，" + dataBean.second + " 秒前");
+                                //Danmu danmu1 = new Danmu(0, userId, "Comment", avatars[0], " 我：这是一条弹幕");
+                                //Danmu danmu2 = new Danmu(0, 1, "Comment", avatars[1], "楼主：这又是一又是一条弹幕");
+                                //Danmu danmu3 = new Danmu(0, 3, "Comment", avatars[2], " 普通：这还是一条弹幕");
+                                //danmus.add(danmu1);
+                                //danmus.add(danmu2);
+                                //danmus.add(danmu3);
+                                //Collections.shuffle(danmus);
+                                //danmus.remove(0);
+                                //danmus.remove(0);
+
                                 Danmu danmu = new Danmu();
                                 danmu.id = 0;
-                                danmu.userId = 1;
+                                danmu.userId = dataBean.userId;
+                                //danmu.type = "Like";    //赞，无背景
                                 danmu.type = "Comment";
                                 danmu.imgUrl = dataBean.imgSrc;
+                                //最新订单来自 黑河 张***   14 秒前
                                 danmu.content = "最新订单来自" + dataBean.city + " " + dataBean.nickName + "，" + dataBean.second + " 秒前";
                                 danmus.add(danmu);
                             }
@@ -474,15 +467,14 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
     //检测弹幕是否开启/关闭
     private void CheckStartDM() {
         String jsonParams = GsonConvertUtil.toJson(MD5Utils.commonMD5());
-        GenericRequestManager.upJson(URL.CheckStartDM, jsonParams, this, new StringDialogCallback(this) {
+        GenericRequestManager.upJson(URL.CheckStartDM, jsonParams, this, new JsonCallback<String>() {
             @Override
             public void onSuccess(Response<String> response) {
 
                 if (!TextUtils.isEmpty(response.body())) {
                     CheckInfo info = GsonConvertUtil.fromJson(response.body(), CheckInfo.class);
                     if (info.IsSuccess) {
-                        //isStartDM = info.records;   //弹幕是否开启/关闭
-                        if (info.records) {
+                        if (info.records) {  //弹幕是否开启/关闭
                             getRollList();  //请求弹幕信息
                         } else {
                             OkLogger.e("----------------------------------弹幕信息关闭---------------------------->");

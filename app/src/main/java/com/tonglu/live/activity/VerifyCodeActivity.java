@@ -23,7 +23,6 @@ import com.tonglu.live.listener.OnClickFastListener;
 import com.tonglu.live.manager.GenericRequestManager;
 import com.tonglu.live.manager.URL;
 import com.tonglu.live.model.CheckInfo;
-import com.tonglu.live.model.LiveListInfo;
 import com.tonglu.live.utils.DealViewUtils;
 import com.tonglu.live.utils.GsonConvertUtil;
 import com.tonglu.live.utils.KeyboardUtils;
@@ -33,7 +32,6 @@ import com.tonglu.live.utils.ValidateUtils;
 import com.tonglu.live.widgets.SecretTextView;
 import com.tonglu.okhttp.OkHttpUtil;
 import com.tonglu.okhttp.model.Response;
-import com.tonglu.okhttp.utils.OkLogger;
 
 import java.util.Map;
 import java.util.Timer;
@@ -42,10 +40,10 @@ import java.util.TreeMap;
 
 /**
  * ===========================================
- * 作    者：zhsh
+ * 作    者：gao_chun
  * 版    本：1.0
- * 创建日期：2016/11/18.
- * 描    述：登录界面
+ * 创建日期：2017/8/8.
+ * 描    述：验证直播密码界面
  * ===========================================
  */
 
@@ -72,8 +70,7 @@ public class VerifyCodeActivity extends BaseActivity {
 
         //提示网络连接不可用
         if (!ValidateUtils.isNetworkConnected(AppAplication.getInstance())) {
-            //mSVProgressHUD.showInfoWithStatus("网络不可用",SVProgressHUD.SVProgressHUDMaskType.None);
-            //mSVProgressHUD.showErrorWithStatus("网络未连接",SVProgressHUD.SVProgressHUDMaskType.None);
+            ToastUtils.showLongToastSafe("网络未连接");
         }
     }
 
@@ -171,9 +168,12 @@ public class VerifyCodeActivity extends BaseActivity {
 
                 case R.id.tv_login://登录
 
-                    String code = et_phone_number.getEditableText().toString();
-                    verifyCode(code);       //调用密码验证接口
-
+                    if (!ValidateUtils.isNetworkConnected(AppAplication.getInstance())) {
+                        ToastUtils.showLongToastSafe("网络不可用！");
+                    } else {
+                        String code = et_phone_number.getEditableText().toString();
+                        verifyCode(code);       //调用密码验证接口
+                    }
                     break;
             }
         }
