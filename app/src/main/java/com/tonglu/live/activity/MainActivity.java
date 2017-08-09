@@ -45,16 +45,10 @@ public class MainActivity extends BaseTitleActivity {
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         mLiveAdapter = new LiveAdapter();
 
-        //获取直播地址
-       /* String TestUrl = "rtmp://live.otofuturestore.com/malls/dianneizhibo_lld?auth_key=1502862908-0-0-10a6fabad2fb2b3c2ec01545c06bddc7";
-        Intent intent = new Intent(MainActivity.this, LivePlayerActivity.class);
-        intent.putExtra("url_address", TestUrl);
-        startActivity(intent);*/
-
         mLiveAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                //ToastUtils.showLongToastSafe(position + "");
+
                 //获取直播地址
                 String url = recordsList.get(position).urls.get(0).url;
                 //OkLogger.e(url);
@@ -72,7 +66,6 @@ public class MainActivity extends BaseTitleActivity {
         }
 
         mRecyclerView.setAdapter(mLiveAdapter);
-
     }
 
 
@@ -141,4 +134,5 @@ public class MainActivity extends BaseTitleActivity {
         super.onDestroy();
         OkHttpUtil.getInstance().cancelTag(this);
     }
+
 }

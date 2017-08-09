@@ -20,12 +20,17 @@ import com.tencent.rtmp.TXLivePlayer;
 import com.tencent.rtmp.ui.TXCloudVideoView;
 import com.tonglu.live.R;
 import com.tonglu.live.callback.JsonCallback;
+import com.tonglu.live.callback.StringDialogCallback;
 import com.tonglu.live.danmu.Danmu;
 import com.tonglu.live.danmu.DanmuControl;
 import com.tonglu.live.manager.CommonBody;
+import com.tonglu.live.manager.GenericRequestManager;
 import com.tonglu.live.manager.URL;
+import com.tonglu.live.model.CheckInfo;
+import com.tonglu.live.model.LiveListInfo;
 import com.tonglu.live.model.RollListInfo;
 import com.tonglu.live.utils.GsonConvertUtil;
+import com.tonglu.live.utils.MD5Utils;
 import com.tonglu.live.utils.ToastUtils;
 import com.tonglu.okhttp.OkHttpUtil;
 import com.tonglu.okhttp.model.Response;
@@ -47,13 +52,10 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
     private boolean mHWDecode = false;
     private LinearLayout mRootView;
 
-    //private static final int CACHE_STRATEGY_FAST = 1;  //极速
-    //private static final int CACHE_STRATEGY_SMOOTH = 2;  //流畅
     private static final int CACHE_STRATEGY_AUTO = 3;  //自动
 
     private static final float CACHE_TIME_FAST = 1.0f;
     private static final float CACHE_TIME_SMOOTH = 5.0f;
-
 
     //public static final int ACTIVITY_TYPE_PUBLISH = 1;
     public static final int ACTIVITY_TYPE_LIVE_PLAY = 2;
@@ -73,9 +75,16 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
 
     protected String mUrlAddress;//直播地址
 
-    //弹幕相关
+
+    //-------------------弹幕相关属性
     private DanmuControl mDanmuControl;
     private IDanmakuView mDanmakuView;
+    //private boolean isStartDM;
+    private List<Danmu> danmus = new ArrayList<>();
+    private int i = 0;
+    private int TIME = 7000;//默认7秒
+    private static Handler mHandler;
+
 
     private final int userId = 30224;
 
@@ -92,6 +101,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         super.setContentView(R.layout.activity_play);
 
+        //获取视频播放地址
         handleIntent();
 
         //setRenderMode：铺满or适应
@@ -109,9 +119,11 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
         mPlayConfig = new TXLivePlayConfig();
         initView();
 
-
         OkLogger.e("TIME--------------------------->" + TIME);
-        handler.postDelayed(runnable, TIME); //每隔s执行一条弹屏信息
+        if (mHandler == null) {
+            mHandler = new Handler();
+        }
+        mHandler.postDelayed(runnable, TIME); //每隔s执行一条弹屏信息
 
     }
 
@@ -124,18 +136,14 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
         }
     }
 
-    List<Danmu> danmus = new ArrayList<>();
-    int i = 0;
 
-    private int TIME = 7000;//默认8秒
-    Handler handler = new Handler();
     Runnable runnable = new Runnable() {
 
         @Override
         public void run() {
             // handler自带方法实现定时器
             try {
-                handler.postDelayed(this, TIME);
+                mHandler.postDelayed(this, TIME);
 
                 //TIME = (int) Math.round(Math.random() * (10000 - 400) + 10000);
                 TIME = (int) Math.round(Math.random() * (8000 - 1000) + 9000);
@@ -151,10 +159,11 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
                 //danmus.remove(0);
                 /*******TEST********/
 
-                //OkLogger.e("-------------i> " + i++);
+                OkLogger.e("-------------i> " + i);
 
+                //danmus.size() > 0 说明有数据，否则需要请求弹幕信息
                 if (danmus.size() > 0) {
-                    if (i >= 20) {
+                    if (i >= 20) {  //-----大于等于20则清除danmus中的内容
                         danmus.clear();
                         i = 0;
                         OkLogger.e("----------------------------------danmus.clear()---------------------------->");
@@ -163,7 +172,11 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
                         mDanmuControl.addDanmu(danmus.get(i++));
                     }
                 } else {
-                    getRollList();//请求弹幕信息
+                    CheckStartDM(); //检测弹幕是否开启
+
+                   /* if (isStartDM) {
+                        getRollList();  //请求弹幕信息
+                    }*/
                 }
 
             } catch (Exception e) {
@@ -229,11 +242,10 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
         mPlayConfig = null;
 
 
-
         OkLogger.e("----------------->vrender onDestroy");
         mDanmuControl.destroy();
-        if (handler != null) {
-            handler = null;
+        if (mHandler != null) {
+            mHandler = null;
         }
         OkHttpUtil.getInstance().cancelTag(this);
     }
@@ -388,27 +400,10 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
         }
     }
 
-    //公用打印辅助函数
-    /*protected String getNetStatusString(Bundle status) {
-        String str = String.format("%-14s %-14s %-12s\n%-14s %-14s %-12s\n%-14s %-14s %-12s\n%-14s %-12s",
-                "CPU:" + status.getString(TXLiveConstants.NET_STATUS_CPU_USAGE),
-                "RES:" + status.getInt(TXLiveConstants.NET_STATUS_VIDEO_WIDTH) + "*" + status.getInt(TXLiveConstants.NET_STATUS_VIDEO_HEIGHT),
-                "SPD:" + status.getInt(TXLiveConstants.NET_STATUS_NET_SPEED) + "Kbps",
-                "JIT:" + status.getInt(TXLiveConstants.NET_STATUS_NET_JITTER),
-                "FPS:" + status.getInt(TXLiveConstants.NET_STATUS_VIDEO_FPS),
-                "ARA:" + status.getInt(TXLiveConstants.NET_STATUS_AUDIO_BITRATE) + "Kbps",
-                "QUE:" + status.getInt(TXLiveConstants.NET_STATUS_CODEC_CACHE) + "|" + status.getInt(TXLiveConstants.NET_STATUS_CACHE_SIZE),
-                "DRP:" + status.getInt(TXLiveConstants.NET_STATUS_CODEC_DROP_CNT) + "|" + status.getInt(TXLiveConstants.NET_STATUS_DROP_SIZE),
-                "VRA:" + status.getInt(TXLiveConstants.NET_STATUS_VIDEO_BITRATE) + "Kbps",
-                "SVR:" + status.getString(TXLiveConstants.NET_STATUS_SERVER_IP),
-                "AVRA:" + status.getInt(TXLiveConstants.NET_STATUS_SET_VIDEO_BITRATE));
-        return str;
-    }*/
 
     @Override
     public void onNetStatus(Bundle status) {
         /*String str = getNetStatusString(status);
-
         OkLogger.e("Current status, CPU:" + status.getString(TXLiveConstants.NET_STATUS_CPU_USAGE) +
                 ", RES:" + status.getInt(TXLiveConstants.NET_STATUS_VIDEO_WIDTH) + "*" + status.getInt(TXLiveConstants.NET_STATUS_VIDEO_HEIGHT) +
                 ", SPD:" + status.getInt(TXLiveConstants.NET_STATUS_NET_SPEED) + "Kbps" +
@@ -422,63 +417,18 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
         mCacheStrategy = nCacheStrategy;
 
         switch (nCacheStrategy) {
-            /*case CACHE_STRATEGY_FAST:
-                mPlayConfig.setAutoAdjustCacheTime(true);
-                mPlayConfig.setMaxAutoAdjustCacheTime(CACHE_TIME_FAST);
-                mPlayConfig.setMinAutoAdjustCacheTime(CACHE_TIME_FAST);
-                mLivePlayer.setConfig(mPlayConfig);
-                break;
-
-            case CACHE_STRATEGY_SMOOTH:
-                mPlayConfig.setAutoAdjustCacheTime(false);
-                mPlayConfig.setCacheTime(CACHE_TIME_SMOOTH);
-                mLivePlayer.setConfig(mPlayConfig);
-                break;*/
-
             case CACHE_STRATEGY_AUTO:
                 mPlayConfig.setAutoAdjustCacheTime(true);
                 mPlayConfig.setMaxAutoAdjustCacheTime(CACHE_TIME_SMOOTH);
                 mPlayConfig.setMinAutoAdjustCacheTime(CACHE_TIME_FAST);
                 mLivePlayer.setConfig(mPlayConfig);
                 break;
-
-            default:
-                break;
         }
     }
 
-
-    private void startLoadingAnimation() {
-        if (mLoadingView != null) {
-            mLoadingView.setVisibility(View.VISIBLE);
-            ((AnimationDrawable) mLoadingView.getDrawable()).start();
-        }
-    }
-
-    private void stopLoadingAnimation() {
-        if (mLoadingView != null) {
-            mLoadingView.setVisibility(View.GONE);
-            ((AnimationDrawable) mLoadingView.getDrawable()).stop();
-        }
-    }
-/*
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode != 100 || data == null || data.getExtras() == null || TextUtils.isEmpty(data.getExtras().getString("result"))) {
-            return;
-        }
-        String result = data.getExtras().getString("result");
-        if (mRtmpUrlView != null) {
-            mRtmpUrlView.setText(result);
-        }
-    }*/
-
-
-    //public List<RollListInfo.DataBean> data;
 
     //获取直播列表(默认请求30条弹幕信息)
     private void getRollList() {
-
         Map<String, String> params = new TreeMap<>();
         params.put("count", "20");
         params.putAll(CommonBody.getInstance().commonBody());
@@ -519,4 +469,51 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
             }
         });
     }
+
+
+    //检测弹幕是否开启/关闭
+    private void CheckStartDM() {
+        String jsonParams = GsonConvertUtil.toJson(MD5Utils.commonMD5());
+        GenericRequestManager.upJson(URL.CheckStartDM, jsonParams, this, new StringDialogCallback(this) {
+            @Override
+            public void onSuccess(Response<String> response) {
+
+                if (!TextUtils.isEmpty(response.body())) {
+                    CheckInfo info = GsonConvertUtil.fromJson(response.body(), CheckInfo.class);
+                    if (info.IsSuccess) {
+                        //isStartDM = info.records;   //弹幕是否开启/关闭
+                        if (info.records) {
+                            getRollList();  //请求弹幕信息
+                        } else {
+                            OkLogger.e("----------------------------------弹幕信息关闭---------------------------->");
+                        }
+                    } else {
+                        ToastUtils.showLongToastSafe("请求失败！");
+                    }
+                }
+            }
+
+            @Override
+            public void onError(Response<String> response) {
+                super.onError(response);
+                ToastUtils.showLongToastSafe("请确认服务器是否开启及网络是否连接！");
+            }
+        });
+    }
+
+
+    private void startLoadingAnimation() {
+        if (mLoadingView != null) {
+            mLoadingView.setVisibility(View.VISIBLE);
+            ((AnimationDrawable) mLoadingView.getDrawable()).start();
+        }
+    }
+
+    private void stopLoadingAnimation() {
+        if (mLoadingView != null) {
+            mLoadingView.setVisibility(View.GONE);
+            ((AnimationDrawable) mLoadingView.getDrawable()).stop();
+        }
+    }
+
 }

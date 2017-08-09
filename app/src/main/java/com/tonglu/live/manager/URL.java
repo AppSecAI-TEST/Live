@@ -16,6 +16,8 @@ public class URL {
     public static String CheckPassword = "v/CheckPassword";
     //直播列表
     public static String VedioAddress = "v/VedioAddress";
+    //是否开启弹幕功能
+    public static String CheckStartDM = "v/CheckStartDM";
     //弹幕列表
     public static String RollOrderList = "http://preferentialfapi.591malls.com/api/Order/RollOrderList";
 }
