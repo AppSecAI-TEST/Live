@@ -21,6 +21,8 @@ import com.tonglu.live.base.SystemBarTintManager;
 import com.tonglu.live.callback.StringDialogCallback;
 import com.tonglu.live.listener.OnClickFastListener;
 import com.tonglu.live.manager.GenericRequestManager;
+import com.tonglu.live.manager.URL;
+import com.tonglu.live.model.CheckInfo;
 import com.tonglu.live.model.LiveListInfo;
 import com.tonglu.live.utils.DealViewUtils;
 import com.tonglu.live.utils.GsonConvertUtil;
@@ -31,6 +33,7 @@ import com.tonglu.live.utils.ValidateUtils;
 import com.tonglu.live.widgets.SecretTextView;
 import com.tonglu.okhttp.OkHttpUtil;
 import com.tonglu.okhttp.model.Response;
+import com.tonglu.okhttp.utils.OkLogger;
 
 import java.util.Map;
 import java.util.Timer;
@@ -169,20 +172,9 @@ public class VerifyCodeActivity extends BaseActivity {
                 case R.id.tv_login://登录
 
                     String code = et_phone_number.getEditableText().toString();
-                    if (!TextUtils.isEmpty(code)) {
-                        //调用网络接口
-                        //verifyCode(code);
-
-                        startActivity(new Intent(VerifyCodeActivity.this, MainActivity.class));
-                        finish();
-
-                    } else {
-                        ToastUtils.showLongToastSafe("请输入直播密码！");
-                    }
-
+                    verifyCode(code);       //调用密码验证接口
 
                     break;
-
             }
         }
     }
@@ -192,29 +184,27 @@ public class VerifyCodeActivity extends BaseActivity {
      */
     private void verifyCode(String code) {
 
-        String url = "v/CheckPassword";
-
         Map<String, String> params = new TreeMap<>();
         params.put("password", code);
         params.putAll(MD5Utils.commonMD5());
         String jsonParams = GsonConvertUtil.toJson(params);
-
-        GenericRequestManager.upJson(url, jsonParams, this, new StringDialogCallback(this) {
+        //OkLogger.e("------>" + jsonParams);
+        GenericRequestManager.upJson(URL.CheckPassword, jsonParams, this, new StringDialogCallback(this) {
             @Override
             public void onSuccess(Response<String> response) {
 
                 if (!TextUtils.isEmpty(response.body())) {
-                    //OkLogger.e("------>" + listInfo);
-                   /* LiveListInfo listInfo = GsonConvertUtil.fromJson(response.body(), LiveListInfo.class);
-                    if (listInfo.IsSuccess) {
-
-                        startActivity(new Intent(VerifyCodeActivity.this, MainActivity.class));
-                        finish();
-
+                    CheckInfo info = GsonConvertUtil.fromJson(response.body(), CheckInfo.class);
+                    if (info.IsSuccess) {
+                        if (info.records) {
+                            startActivity(new Intent(VerifyCodeActivity.this, MainActivity.class));
+                            finish();
+                        } else {
+                            ToastUtils.showLongToastSafe("您输入的密码不正确！");
+                        }
                     } else {
                         ToastUtils.showLongToastSafe("请求失败！");
-                    }*/
-
+                    }
                 }
             }
 

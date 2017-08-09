@@ -17,15 +17,9 @@ import com.tonglu.okhttp.request.base.Request;
  */
 public abstract class StringDialogCallback extends StringCallback {
 
-    //private ProgressDialog dialog;
     public Dialog mLoading;
 
     public StringDialogCallback(Activity activity) {
-        /*dialog = new ProgressDialog(activity);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        dialog.setMessage("请求网络中...");*/
 
         if (activity != null) {
             mLoading = ToastUtils.createLoadingDialog(activity);

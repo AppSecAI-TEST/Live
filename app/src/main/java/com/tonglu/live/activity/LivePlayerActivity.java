@@ -23,6 +23,7 @@ import com.tonglu.live.callback.JsonCallback;
 import com.tonglu.live.danmu.Danmu;
 import com.tonglu.live.danmu.DanmuControl;
 import com.tonglu.live.manager.CommonBody;
+import com.tonglu.live.manager.URL;
 import com.tonglu.live.model.RollListInfo;
 import com.tonglu.live.utils.GsonConvertUtil;
 import com.tonglu.live.utils.ToastUtils;
@@ -477,15 +478,13 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
 
     //获取直播列表(默认请求30条弹幕信息)
     private void getRollList() {
-        //String url = "http://yfb-dx.591malls.com:5318/api/Order/RollOrderList";
-        String url = "http://preferentialfapi.591malls.com/api/Order/RollOrderList";
 
         Map<String, String> params = new TreeMap<>();
         params.put("count", "20");
         params.putAll(CommonBody.getInstance().commonBody());
         String jsonParams = GsonConvertUtil.toJson(params);
 
-        OkHttpUtil.<String>post(url).upJson(jsonParams).tag(this).execute(new JsonCallback<String>() {
+        OkHttpUtil.<String>post(URL.RollOrderList).upJson(jsonParams).tag(this).execute(new JsonCallback<String>() {
             @Override
             public void onSuccess(Response<String> response) {
                 if (!TextUtils.isEmpty(response.body())) {

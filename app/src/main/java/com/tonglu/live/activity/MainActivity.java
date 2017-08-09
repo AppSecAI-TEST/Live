@@ -16,6 +16,7 @@ import com.tonglu.live.adapter.LiveAdapter;
 import com.tonglu.live.base.BaseTitleActivity;
 import com.tonglu.live.callback.StringDialogCallback;
 import com.tonglu.live.manager.GenericRequestManager;
+import com.tonglu.live.manager.URL;
 import com.tonglu.live.model.LiveListInfo;
 import com.tonglu.live.utils.GsonConvertUtil;
 import com.tonglu.live.utils.MD5Utils;
@@ -77,11 +78,9 @@ public class MainActivity extends BaseTitleActivity {
 
     //获取直播列表
     private void getLiveList() {
-        String url = "v/VedioAddress";
 
         String jsonParams = GsonConvertUtil.toJson(MD5Utils.commonMD5());
-
-        GenericRequestManager.upJson(url, jsonParams, this, new StringDialogCallback(this) {
+        GenericRequestManager.upJson(URL.VedioAddress, jsonParams, this, new StringDialogCallback(this) {
             @Override
             public void onSuccess(Response<String> response) {
 
@@ -95,7 +94,6 @@ public class MainActivity extends BaseTitleActivity {
                     } else {
                         ToastUtils.showLongToastSafe("请求失败！");
                     }
-                    //OkLogger.e("------>" + listInfo);
                 }
             }
 
