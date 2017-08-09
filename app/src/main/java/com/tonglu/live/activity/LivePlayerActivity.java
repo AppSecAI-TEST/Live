@@ -20,7 +20,6 @@ import com.tencent.rtmp.TXLivePlayer;
 import com.tencent.rtmp.ui.TXCloudVideoView;
 import com.tonglu.live.R;
 import com.tonglu.live.callback.JsonCallback;
-import com.tonglu.live.callback.StringDialogCallback;
 import com.tonglu.live.danmu.Danmu;
 import com.tonglu.live.danmu.DanmuControl;
 import com.tonglu.live.manager.CommonBody;
@@ -33,7 +32,6 @@ import com.tonglu.live.utils.MD5Utils;
 import com.tonglu.live.utils.ToastUtils;
 import com.tonglu.okhttp.OkHttpUtil;
 import com.tonglu.okhttp.model.Response;
-import com.tonglu.okhttp.utils.OkLogger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -116,7 +114,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
         mPlayConfig = new TXLivePlayConfig();
         initView();
 
-        OkLogger.e("TIME--------------------------->" + TIME);
+        //OkLogger.e("TIME--------------------------->" + TIME);
         if (mHandler == null) {
             //保证 mHandler 不为空
             mHandler = new Handler();
@@ -130,7 +128,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
         if (intent.hasExtra("url_address")) {
             mUrlAddress = intent.getStringExtra("url_address");
         } else {
-            OkLogger.e("No extras.");
+            //OkLogger.e("No extras.");
         }
     }
 
@@ -145,15 +143,15 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
 
                 //TIME = (int) Math.round(Math.random() * (10000 - 400) + 10000);
                 TIME = (int) Math.round(Math.random() * (8000 - 1000) + 9000);
-                OkLogger.e("TIME-------------TIME-------------->" + TIME);
-                OkLogger.e("-------------i> " + i);
+                //OkLogger.e("TIME-------------TIME-------------->" + TIME);
+                //OkLogger.e("-------------i> " + i);
 
                 //danmus.size() > 0 说明有数据，否则需要请求弹幕信息
                 if (danmus.size() > 0) {
                     if (i >= 20) {  //-----大于等于20则清除danmus中的内容
                         danmus.clear();
                         i = 0;
-                        OkLogger.e("----------------------------------danmus.clear()---------------------------->");
+                        //OkLogger.e("----------------------------------danmus.clear()---------------------------->");
                     } else {
                         // 添加弹幕
                         mDanmuControl.addDanmu(danmus.get(i++));
@@ -225,7 +223,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
         mPlayConfig = null;
 
 
-        OkLogger.e("----------------->vrender onDestroy");
+        //OkLogger.e("----------------->vrender onDestroy");
         mDanmuControl.destroy();
         if (mHandler != null) {
             mHandler = null;
@@ -335,7 +333,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
             return false;
         }
 
-        OkLogger.e("点击播放按钮！播放类型：" + mPlayType);
+        //OkLogger.e("点击播放按钮！播放类型：" + mPlayType);
         startLoadingAnimation();
 
         mStartPlayTS = System.currentTimeMillis();
@@ -425,7 +423,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
                     RollListInfo listInfo = GsonConvertUtil.fromJson(response.body(), RollListInfo.class);
                     if (listInfo.isBizSuccess) {
                         if (listInfo.data.size() > 0) {
-                            OkLogger.e("listInfo.data.size()-------------------->" + listInfo.data.size());
+                            //OkLogger.e("listInfo.data.size()-------------------->" + listInfo.data.size());
                             for (RollListInfo.DataBean dataBean : listInfo.data) {
 
                                 //Danmu danmu1 = new Danmu(0, userId, "Comment", avatars[0], " 我：这是一条弹幕");
@@ -477,7 +475,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
                         if (info.records) {  //弹幕是否开启/关闭
                             getRollList();  //请求弹幕信息
                         } else {
-                            OkLogger.e("----------------------------------弹幕信息关闭---------------------------->");
+                            //OkLogger.e("----------------------------------弹幕信息关闭---------------------------->");
                         }
                     } else {
                         ToastUtils.showLongToastSafe("请求失败！");

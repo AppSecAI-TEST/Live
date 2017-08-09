@@ -216,7 +216,6 @@ public class VerifyCodeActivity extends BaseActivity {
         });
     }
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();

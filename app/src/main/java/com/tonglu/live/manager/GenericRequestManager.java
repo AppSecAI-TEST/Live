@@ -64,7 +64,8 @@ public class GenericRequestManager {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         //Log相关设置
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor("OkHttpUtil");
-        loggingInterceptor.setPrintLevel(HttpLoggingInterceptor.Level.BODY);        //log打印级别，决定了log显示的详细程度
+        //loggingInterceptor.setPrintLevel(HttpLoggingInterceptor.Level.BODY);        //log打印级别，决定了log显示的详细程度
+        loggingInterceptor.setPrintLevel(HttpLoggingInterceptor.Level.NONE);        //log打印级别，决定了log显示的详细程度
         loggingInterceptor.setColorLevel(Level.SEVERE);                               //log颜色级别，决定了log在控制台显示的颜色
         builder.addInterceptor(loggingInterceptor);                                 //添加默认debug日志
         //builder.addInterceptor(new LoggerInterceptor("OkHttpUtil", true));
