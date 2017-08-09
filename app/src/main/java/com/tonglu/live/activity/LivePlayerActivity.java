@@ -53,8 +53,6 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
     private static final float CACHE_TIME_FAST = 1.0f;
     private static final float CACHE_TIME_SMOOTH = 5.0f;
 
-    //private static final float CACHE_TIME_AUTO_MIN = 5.0f;
-    //private static final float CACHE_TIME_AUTO_MAX = 10.0f;
 
     //public static final int ACTIVITY_TYPE_PUBLISH = 1;
     public static final int ACTIVITY_TYPE_LIVE_PLAY = 2;
@@ -109,6 +107,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
         mActivityType = getIntent().getIntExtra("PLAY_TYPE", ACTIVITY_TYPE_LIVE_PLAY);
         mPlayConfig = new TXLivePlayConfig();
         initView();
+
 
         OkLogger.e("TIME--------------------------->" + TIME);
         handler.postDelayed(runnable, TIME); //每隔s执行一条弹屏信息
@@ -228,12 +227,16 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
         }
         mPlayConfig = null;
 
+
+
         OkLogger.e("----------------->vrender onDestroy");
         mDanmuControl.destroy();
         if (handler != null) {
             handler = null;
         }
+        OkHttpUtil.getInstance().cancelTag(this);
     }
+
 
     @Override
     public void onPause() {
@@ -513,7 +516,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
             @Override
             public void onError(Response<String> response) {
                 super.onError(response);
-                //ToastUtils.showLongToastSafe("请确认服务器是否开启！");
+                ToastUtils.showLongToastSafe("服务器错误！");
             }
         });
     }

@@ -43,7 +43,6 @@
         android:layout_marginRight="30dp"
         android:layout_marginTop="50dp"
         android:drawableLeft="@mipmap/ic_user_password"
-        android:drawablePadding="54px"
         android:gravity="center"
         android:hint="请输入直播密码"
         android:inputType="number"

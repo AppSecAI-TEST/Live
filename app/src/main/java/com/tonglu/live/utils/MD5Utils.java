@@ -23,8 +23,6 @@ import static com.tonglu.live.utils.Constants.APP_KEY;
 public class MD5Utils {
 
 
-
-
     private MD5Utils() {
         //防止初始化
     }
@@ -110,6 +108,19 @@ public class MD5Utils {
         }
     }
 
+
+    //公共的MD5加密方法
+    public static Map<String, String> commonMD5() {
+
+        Map<String, String> params = new TreeMap<>();
+        params.put("appkey", Constants.APP_KEY_);
+        params.put("appsecret", Constants.APP_SECRET);
+        //MD5加密
+        String signTest = "abc" + Constants.APP_KEY_ + Constants.APP_SECRET + "cba";
+        params.put("sign", MD5Utils.MD5(signTest));
+
+        return params;
+    }
 
     /*public static String md5(String string, String slat) {
         if (TextUtils.isEmpty(string)) {

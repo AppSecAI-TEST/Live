@@ -17,16 +17,14 @@ import com.tonglu.live.base.BaseTitleActivity;
 import com.tonglu.live.callback.StringDialogCallback;
 import com.tonglu.live.manager.GenericRequestManager;
 import com.tonglu.live.model.LiveListInfo;
-import com.tonglu.live.utils.Constants;
 import com.tonglu.live.utils.GsonConvertUtil;
 import com.tonglu.live.utils.MD5Utils;
 import com.tonglu.live.utils.ToastUtils;
 import com.tonglu.live.utils.ValidateUtils;
+import com.tonglu.okhttp.OkHttpUtil;
 import com.tonglu.okhttp.model.Response;
 
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 public class MainActivity extends BaseTitleActivity {
 
@@ -51,7 +49,6 @@ public class MainActivity extends BaseTitleActivity {
         Intent intent = new Intent(MainActivity.this, LivePlayerActivity.class);
         intent.putExtra("url_address", TestUrl);
         startActivity(intent);*/
-
 
         mLiveAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
@@ -82,15 +79,7 @@ public class MainActivity extends BaseTitleActivity {
     private void getLiveList() {
         String url = "v/VedioAddress";
 
-        Map<String, String> params = new TreeMap<>();
-        params.put("appkey", Constants.APP_KEY_);
-        params.put("appsecret", Constants.APP_SECRET);
-
-        //MD5加密
-        String signTest = "abc" + Constants.APP_KEY_ + Constants.APP_SECRET + "cba";
-        params.put("sign", MD5Utils.MD5(signTest));
-
-        String jsonParams = GsonConvertUtil.toJson(params);
+        String jsonParams = GsonConvertUtil.toJson(MD5Utils.commonMD5());
 
         GenericRequestManager.upJson(url, jsonParams, this, new StringDialogCallback(this) {
             @Override
@@ -119,6 +108,7 @@ public class MainActivity extends BaseTitleActivity {
     }
 
     private long exitTime = 0;  //退出时间
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
@@ -145,5 +135,12 @@ public class MainActivity extends BaseTitleActivity {
             return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        OkHttpUtil.getInstance().cancelTag(this);
     }
 }

@@ -12,9 +12,11 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.CAMERA" />
 
+<!--
     <uses-feature
         android:name="android.hardware.type.television"
         android:required="true" />
+-->
 
 
     <!-- 仅仅在TV上运行设置为true，在TV和phone上运行设置为false。 -->

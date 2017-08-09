@@ -18,15 +18,24 @@ import com.tonglu.live.AppAplication;
 import com.tonglu.live.R;
 import com.tonglu.live.base.BaseActivity;
 import com.tonglu.live.base.SystemBarTintManager;
+import com.tonglu.live.callback.StringDialogCallback;
 import com.tonglu.live.listener.OnClickFastListener;
+import com.tonglu.live.manager.GenericRequestManager;
+import com.tonglu.live.model.LiveListInfo;
 import com.tonglu.live.utils.DealViewUtils;
+import com.tonglu.live.utils.GsonConvertUtil;
 import com.tonglu.live.utils.KeyboardUtils;
+import com.tonglu.live.utils.MD5Utils;
+import com.tonglu.live.utils.ToastUtils;
 import com.tonglu.live.utils.ValidateUtils;
 import com.tonglu.live.widgets.SecretTextView;
 import com.tonglu.okhttp.OkHttpUtil;
+import com.tonglu.okhttp.model.Response;
 
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.TreeMap;
 
 /**
  * ===========================================
@@ -142,12 +151,12 @@ public class VerifyCodeActivity extends BaseActivity {
         @Override
         public void afterTextChanged(Editable s) {
 
-                if (!TextUtils.isEmpty(et_phone_number.getText())) {
-                    DealViewUtils.buttonState(tv_login, R.drawable.rectangle_27dp_blue_selected, true);
-                } else {
-                    DealViewUtils.buttonState(tv_login, R.drawable.rectangle_27dp_blue, false);
-                }
+            if (!TextUtils.isEmpty(et_phone_number.getText())) {
+                DealViewUtils.buttonState(tv_login, R.drawable.rectangle_27dp_blue_selected, true);
+            } else {
+                DealViewUtils.buttonState(tv_login, R.drawable.rectangle_27dp_blue, false);
             }
+        }
 
     };
 
@@ -159,18 +168,19 @@ public class VerifyCodeActivity extends BaseActivity {
 
                 case R.id.tv_login://登录
 
-//                    new AlertView("Eworkpal提示", "账号密码错误请重新输入", null, new String[]{"确定"}, null,VerifyCodeActivity.this,
-//                            AlertView.Style.Alert,new ItemClick() {
-//                        @Override
-//                        public void onItemClick(Object o, int position) {
-//
-//                            //...点击取消按钮返回 －1，其他按钮从0开始算
-//
-//                        }
-//                    }).show();
+                    String code = et_phone_number.getEditableText().toString();
+                    if (!TextUtils.isEmpty(code)) {
+                        //调用网络接口
+                        //verifyCode(code);
 
-                    startActivity(new Intent(VerifyCodeActivity.this, MainActivity.class));
-                    finish();
+                        startActivity(new Intent(VerifyCodeActivity.this, MainActivity.class));
+                        finish();
+
+                    } else {
+                        ToastUtils.showLongToastSafe("请输入直播密码！");
+                    }
+
+
                     break;
 
             }
@@ -178,29 +188,42 @@ public class VerifyCodeActivity extends BaseActivity {
     }
 
     /**
-     * 提交登录,返回企业列表(企业Id,企业Name)
+     * 验证直播密码
      */
-    private void loginGo(String phone, String password) {
+    private void verifyCode(String code) {
 
-        /*Map<String, Object> mapList = new HashMap<String, Object>();
-        mapList.put("phone", phone);
-        mapList.put("password",password);
-        mapList.put("type", ResultErrorCode.TYPE_LOGIN_TERMINAL);
-        mapList.put("ispass", pass);
-        String str = GsonConvertUtil.toJson(mapList);
+        String url = "v/CheckPassword";
 
-        UserRequestManager.getInstance().loginGo(this, str, new DialogCallback<BaseResponse<List<UserLoginToModle>>>(this) {
+        Map<String, String> params = new TreeMap<>();
+        params.put("password", code);
+        params.putAll(MD5Utils.commonMD5());
+        String jsonParams = GsonConvertUtil.toJson(params);
+
+        GenericRequestManager.upJson(url, jsonParams, this, new StringDialogCallback(this) {
             @Override
-            public void onSuccess(BaseResponse<List<UserLoginToModle>> baseResponse, Call call, Response response) {
+            public void onSuccess(Response<String> response) {
 
+                if (!TextUtils.isEmpty(response.body())) {
+                    //OkLogger.e("------>" + listInfo);
+                   /* LiveListInfo listInfo = GsonConvertUtil.fromJson(response.body(), LiveListInfo.class);
+                    if (listInfo.IsSuccess) {
+
+                        startActivity(new Intent(VerifyCodeActivity.this, MainActivity.class));
+                        finish();
+
+                    } else {
+                        ToastUtils.showLongToastSafe("请求失败！");
+                    }*/
+
+                }
             }
 
             @Override
-            public void onError(Call call, Response response, Exception e) {
-                super.onError(call, response, e);
-                OkLogger.e(e.toString());
+            public void onError(Response<String> response) {
+                super.onError(response);
+                ToastUtils.showLongToastSafe("请确认服务器是否开启及网络是否连接！");
             }
-        });*/
+        });
     }
 
 

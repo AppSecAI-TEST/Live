@@ -13,6 +13,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.tonglu.live.R;
+import com.tonglu.okhttp.OkHttpUtil;
 
 import java.io.Serializable;
 
@@ -217,4 +218,7 @@ public class BaseActivity extends AppCompatActivity {
         intent.putExtras(bundle);
         startActivityForResult(intent, requestCode);
     }
+
+
+
 }
