@@ -45,7 +45,7 @@ public abstract class DialogCallback<T> extends JsonCallback<T> {
             mLoading.show();
         }
 
-        OkLogger.e("添加公共请求头-----DialogCallback");
+        //OkLogger.e("添加公共请求头-----DialogCallback");
         //request.headers("currentUserId", currentUserId + "")
         //        .headers("UserSign", userSign);
     }

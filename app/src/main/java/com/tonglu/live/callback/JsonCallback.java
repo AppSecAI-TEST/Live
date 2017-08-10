@@ -39,7 +39,7 @@ public abstract class JsonCallback<T> extends AbsCallback<T> {
     public void onStart(Request<T, ? extends Request> request) {
         super.onStart(request);
 
-        OkLogger.e("添加公共请求头-----JsonCallback");
+        //OkLogger.e("添加公共请求头-----JsonCallback");
         //request.headers("currentUserId", currentUserId + "")
         //        .headers("UserSign", userSign);
 

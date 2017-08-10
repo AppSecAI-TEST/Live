@@ -42,7 +42,7 @@ public class MD5Utils {
         // 第一步：把字典按Key的字母顺序排序
         Map<String, String> resultMap = sortMapByKey(map);
         for (Map.Entry<String, String> entry : resultMap.entrySet()) {
-            OkLogger.e("key= " + entry.getKey() + " and value= " + entry.getValue());
+            //OkLogger.e("key= " + entry.getKey() + " and value= " + entry.getValue());
             if (!TextUtils.isEmpty(entry.getKey()) && !TextUtils.isEmpty(entry.getValue())) {
                 // 第二步：把所有参数名和参数值串在一起
                 query.append(entry.getKey()).append(entry.getValue());
@@ -50,7 +50,7 @@ public class MD5Utils {
         }
         // 第三步：使用MD5加密,则直接将返回String类型的加密数据
         String encryption = StringUtils.hash(query.toString());
-        OkLogger.e("排序后的MD5加密值-->" + encryption);
+        //OkLogger.e("排序后的MD5加密值-->" + encryption);
         return encryption.toUpperCase();
     }
 
