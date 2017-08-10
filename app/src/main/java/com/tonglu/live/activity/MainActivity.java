@@ -50,7 +50,7 @@ public class MainActivity extends BaseTitleActivity {
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
 
                 //获取直播地址
-                String url = recordsList.get(position).urls.get(0).url;
+                String url = recordsList.get(position).urls.get(1).url;
                 //OkLogger.e(url);
                 Intent intent = new Intent(MainActivity.this, LivePlayerActivity.class);
                 intent.putExtra("url_address", url);

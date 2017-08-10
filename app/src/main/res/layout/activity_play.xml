@@ -8,8 +8,21 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="0dp">
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/iv_paly_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|center_vertical"
+            android:drawablePadding="10dp"
+            android:drawableTop="@mipmap/play_start"
+            android:focusable="true"
+            android:text="点击启动直播"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:visibility="gone" />
+
 
         <com.tencent.rtmp.ui.TXCloudVideoView
             android:id="@+id/video_view"

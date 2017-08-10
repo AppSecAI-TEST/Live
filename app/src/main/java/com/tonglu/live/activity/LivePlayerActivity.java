@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tencent.rtmp.ITXLivePlayListener;
@@ -72,6 +73,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
 
     protected String mUrlAddress;//直播地址
 
+    private TextView iv_paly_start;
 
     //-------------------弹幕相关属性
     private DanmuControl mDanmuControl;
@@ -188,10 +190,23 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
 
         mVideoPlay = false; //默认设置为False
 
+
+        //点击播放
+        iv_paly_start = (TextView) findViewById(R.id.iv_paly_start);
+        iv_paly_start.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                iv_paly_start.setVisibility(View.INVISIBLE);
+                toPlay();//播放
+            }
+        });
+
+
         toPlay();//播放
 
         this.setCacheStrategy(CACHE_STRATEGY_AUTO);
     }
+
 
     private void toPlay() {
         if (mVideoPlay) {
@@ -330,6 +345,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
 
         if (result != 0) {
             mRootView.setBackgroundResource(R.mipmap.main_bkg);
+            iv_paly_start.setVisibility(View.VISIBLE);//重新加载按钮可见
             return false;
         }
 
@@ -340,10 +356,13 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
         return true;
     }
 
+
     private void stopPlayRtmp() {
 
         //mBtnPlay.setImageResource(R.mipmap.play_start);
         mRootView.setBackgroundResource(R.mipmap.main_bkg);
+        iv_paly_start.setVisibility(View.VISIBLE);//重新加载按钮可见
+
         stopLoadingAnimation();
         if (mLivePlayer != null) {
             mLivePlayer.setPlayListener(null);
@@ -375,7 +394,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
 //            mLivePlayer.onLogRecord("[event:"+event+"]"+msg+"\n");
 //        }
         if (event < 0) {
-            Toast.makeText(getApplicationContext(), param.getString(TXLiveConstants.EVT_DESCRIPTION), Toast.LENGTH_SHORT).show();
+            ToastUtils.showLongToastSafe(param.getString(TXLiveConstants.EVT_DESCRIPTION));
         } else if (event == TXLiveConstants.PLAY_EVT_PLAY_BEGIN) {
             stopLoadingAnimation();
         }
