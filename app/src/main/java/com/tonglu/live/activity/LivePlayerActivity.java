@@ -185,7 +185,7 @@ public class LivePlayerActivity extends Activity implements ITXLivePlayListener 
         }
 
         mPlayerView = (TXCloudVideoView) findViewById(R.id.video_view);
-        mPlayerView.disableLog(true);
+        //mPlayerView.disableLog(true);
         mLoadingView = (ImageView) findViewById(R.id.loadingImageView);
 
         mVideoPlay = false; //默认设置为False
